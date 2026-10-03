@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=8";
+import { firebaseConfig } from "./firebase-config.js?v=9";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -168,7 +168,7 @@ function demarrerProgramme() {
   $("ajouter-programme").addEventListener("click", () => ouvrirFiche(null));
   $("annuler-programme").addEventListener("click", () => fiche.close());
 
-  // « Retirer » ne supprime rien : l'idée va dans « Non affecté », en bas du programme,
+  // « Retirer » ne supprime rien : l'idée va dans « Idées sans date, à placer », en bas du programme,
   // avec toutes ses informations. On la remet au programme en lui redonnant un jour.
   $("retirer-programme").addEventListener("click", async () => {
     if (!ideeOuverte) return;
@@ -182,7 +182,7 @@ function demarrerProgramme() {
     }
   });
 
-  // Suppression définitive : seulement pour une idée déjà « Non affecté ».
+  // Suppression définitive : seulement pour une idée déjà « Idées sans date, à placer ».
   $("supprimer-programme").addEventListener("click", async () => {
     if (!ideeOuverte) return;
     if (!confirm(`Supprimer définitivement « ${ideeOuverte.nom} » pour toute la famille ?`)) return;
@@ -287,7 +287,7 @@ function afficherProgramme() {
 
   const groupes = [
     ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour)]),
-    ["Non affecté", idees.filter((i) => !JOURS.includes(i.jour))],
+    ["Idées sans date, à placer", idees.filter((i) => !JOURS.includes(i.jour))],
   ];
 
   for (const [titre, elements] of groupes) {
@@ -424,7 +424,7 @@ function demarrerRessources() {
   });
 }
 
-// Les idées du programme dans l'ordre du voyage (les « Non affecté » à la fin).
+// Les idées du programme dans l'ordre du voyage (les « Idées sans date, à placer » à la fin).
 function ideesDansLOrdre() {
   return [...idees].sort((a, b) =>
     (JOURS.includes(a.jour) ? a.jour : "9").localeCompare(JOURS.includes(b.jour) ? b.jour : "9") ||
