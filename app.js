@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
-  arrayUnion, arrayRemove, writeBatch, setDoc
+  arrayUnion, arrayRemove, writeBatch, setDoc, deleteField
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=19";
+import { firebaseConfig } from "./firebase-config.js?v=20";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -120,7 +120,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=19";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=20";
       $("fiche-guide").showModal();
     });
   }
@@ -521,7 +521,98 @@ function afficherSelecteurVariantes() {
   adopter.type = "button";
   adopter.addEventListener("click", adopterVariante);
   zone.append(el("p", "discret legende-variantes",
-    `${Object.keys(VARIANTES).length} variantes du programme : les journées marquées « Variante » changent, le reste est commun.`), choix, adopter);
+    `${Object.keys(VARIANTES).length} variantes du programme : les journées marquées « Variante » changent, le reste est commun.`),
+    choix, blocVote(), adopter);
+}
+
+/* ---------- Programme : vote de la famille pour une variante ---------- */
+
+function voteDe(prenom) {
+  const vote = votes[prenom];
+  return vote && VARIANTES[vote.variante] ? vote : null;
+}
+
+async function enregistrerVote(changements) {
+  try {
+    await setDoc(doc(db, "voyages", code, "jours", "votes"), { [moi()]: changements }, { merge: true });
+  } catch (erreur) {
+    signalerErreur($("etat-programme"), erreur);
+  }
+}
+
+function blocVote() {
+  const bloc = el("section", "vote");
+  bloc.append(el("h3", "titre-vote", "🗳️ Quelle variante préférez-vous ?"));
+
+  // Mon vote : un toucher pour choisir, un second pour annuler.
+  const monVote = voteDe(moi());
+  const boutons = el("div", "boutons-vote");
+  for (const v of Object.keys(VARIANTES)) {
+    const choisi = monVote?.variante === v;
+    const bouton = el("button", "bouton-vote" + (choisi ? " choisi" : ""), v + (choisi ? " ✓" : ""));
+    bouton.type = "button";
+    bouton.setAttribute("aria-pressed", String(choisi));
+    bouton.setAttribute("aria-label", `Voter pour la variante ${v} : ${VARIANTES[v]}`);
+    bouton.addEventListener("click", () => {
+      if (choisi) enregistrerVote(deleteField());
+      else enregistrerVote({ variante: v, mot: monVote?.mot || "", le: serverTimestamp() });
+    });
+    boutons.append(bouton);
+  }
+  bloc.append(boutons);
+
+  // Résultats, en direct, avec les prénoms.
+  const parVariante = {};
+  for (const v of Object.keys(VARIANTES)) parVariante[v] = VOYAGEURS.filter((p) => voteDe(p)?.variante === v);
+  const max = Math.max(...Object.values(parVariante).map((l) => l.length));
+  const enTete = Object.keys(VARIANTES).filter((v) => max > 0 && parVariante[v].length === max);
+
+  const resultats = el("ul", "resultats-vote");
+  for (const [v, prenoms] of Object.entries(parVariante)) {
+    const ligne = el("li");
+    const barre = el("span", "barre-vote");
+    const remplissage = el("span", "remplissage-vote");
+    remplissage.style.width = (prenoms.length / VOYAGEURS.length) * 100 + "%";
+    barre.append(remplissage);
+    ligne.append(
+      el("b", "lettre-vote", v),
+      barre,
+      el("span", "prenoms-vote", (prenoms.join(", ") || "—") + (enTete.length === 1 && enTete[0] === v ? " 👑" : "")),
+    );
+    resultats.append(ligne);
+  }
+  bloc.append(resultats);
+  if (enTete.length > 1) bloc.append(el("p", "discret", `Égalité entre ${enTete.join(" et ")} : à Emmanuelle de trancher !`));
+
+  // Les petits mots.
+  const mots = VOYAGEURS.filter((p) => voteDe(p)?.mot);
+  if (mots.length) {
+    const liste = el("ul", "mots-vote");
+    for (const p of mots) liste.append(el("li", "", `💬 ${p} (${voteDe(p).variante}) : « ${voteDe(p).mot} »`));
+    bloc.append(liste);
+  }
+
+  if (monVote) {
+    const formulaire = el("form", "mot-vote");
+    const champ = el("input");
+    champ.type = "text";
+    champ.maxLength = 140;
+    champ.placeholder = "💬 Un mot pour expliquer votre choix ?";
+    champ.value = monVote.mot || "";
+    const ok = el("button", "bouton-secondaire", "OK");
+    ok.type = "submit";
+    formulaire.append(champ, ok);
+    formulaire.addEventListener("submit", (evenement) => {
+      evenement.preventDefault();
+      champ.blur();
+      enregistrerVote({ ...monVote, mot: champ.value.trim().slice(0, 140) });
+    });
+    bloc.append(formulaire);
+  }
+
+  const attente = VOYAGEURS.filter((p) => !voteDe(p));
+  bloc.append(el("p", "discret", attente.length ? `En attente de : ${attente.join(", ")}` : "🎉 Tout le monde a voté !"));
+  return bloc;
 }
 
 // Garde la variante choisie et supprime les activités planifiées de l'autre.
@@ -538,6 +629,7 @@ async function adopterVariante() {
   for (const i of idees.filter((i) => i.variante && !aSupprimer.includes(i))) {
     lot.update(doc(programme, i.id), { variante: "", modifiePar: moi(), modifieLe: serverTimestamp() });
   }
+  lot.delete(doc(jours, "votes"));
   for (const jour of JOURS) {
     const titre = titresJours[jour + "-" + v];
     if (titre) lot.set(doc(jours, jour), { titre, modifiePar: moi(), modifieLe: serverTimestamp() });
@@ -558,13 +650,17 @@ async function adopterVariante() {
 // Un document par journée (identifiant = la date), avec son titre : « Vatican »…
 let titresJours = {};
 let jourOuvert = null;
+// Votes pour les variantes : { "Solange": { variante: "A", mot: "…" }, … }
+let votes = {};
 
 function ecouterTitresJours() {
   onSnapshot(
     collection(db, "voyages", code, "jours"),
     (resultat) => {
       titresJours = {};
+      votes = {};
       for (const d of resultat.docs) {
+        if (d.id === "votes") votes = d.data();
         const jour = d.id.replace(/-[A-Z]$/, "");
         if (JOURS.includes(jour) && d.data().titre) titresJours[d.id] = d.data().titre;
       }
