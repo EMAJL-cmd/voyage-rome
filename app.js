@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
-  arrayUnion, arrayRemove
+  arrayUnion, arrayRemove, writeBatch
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=11";
+import { firebaseConfig } from "./firebase-config.js?v=12";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -82,7 +82,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=11";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=12";
       $("fiche-guide").showModal();
     });
   }
@@ -175,6 +175,7 @@ function demarrerProgramme() {
   const formulaire = $("formulaire-programme");
 
   $("ajouter-programme").addEventListener("click", () => ouvrirFiche(null));
+  demarrerAjoutRapide(programme);
   $("annuler-programme").addEventListener("click", () => fiche.close());
 
   // « Retirer » ne supprime rien : l'idée va dans « Idées sans date, à placer », en bas du programme,
@@ -228,6 +229,74 @@ function demarrerProgramme() {
       } else {
         await addDoc(programme, { ...donnees, auteur: moi(), creeLe: serverTimestamp() });
       }
+    } catch (erreur) {
+      signalerErreur($("etat-programme"), erreur);
+    }
+  });
+}
+
+// Pour comparer des noms sans tenir compte des majuscules ni des accents.
+function nomSimplifie(nom) {
+  return nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function afficherMessage(texte) {
+  const message = $("message-programme");
+  message.textContent = texte;
+  message.hidden = false;
+  clearTimeout(afficherMessage.minuteur);
+  afficherMessage.minuteur = setTimeout(() => { message.hidden = true; }, 8000);
+}
+
+function demarrerAjoutRapide(programme) {
+  const fiche = $("fiche-rapide");
+  const formulaire = $("formulaire-rapide");
+  const f = formulaire.elements;
+
+  $("ajout-rapide-programme").addEventListener("click", () => {
+    formulaire.reset();
+    f.auteur.replaceChildren(...VOYAGEURS.map((p) => new Option(p, p)));
+    f.auteur.value = moi();
+    fiche.showModal();
+  });
+  $("annuler-rapide").addEventListener("click", () => fiche.close());
+
+  formulaire.addEventListener("submit", async (evenement) => {
+    evenement.preventDefault();
+    // Virgules, points-virgules ou retours à la ligne séparent les noms.
+    const deja = new Set(idees.map((i) => nomSimplifie(i.nom || "")));
+    const nouveaux = [];
+    const ignores = [];
+    for (const morceau of f.noms.value.split(/[,;\n]+/)) {
+      const nom = morceau.replace(/\s+/g, " ").trim().slice(0, 120);
+      if (!nom) continue;
+      if (nouveaux.some((n) => nomSimplifie(n) === nomSimplifie(nom))) continue; // tapé deux fois
+      if (deja.has(nomSimplifie(nom))) { ignores.push(nom); continue; }
+      nouveaux.push(nom);
+    }
+    if (nouveaux.length === 0 && ignores.length === 0) return;
+    if (nouveaux.length > 40) {
+      alert("C'est beaucoup d'un coup ! 40 noms au maximum par ajout.");
+      return;
+    }
+    fiche.close();
+
+    try {
+      if (nouveaux.length) {
+        const lot = writeBatch(db);
+        for (const nom of nouveaux) {
+          lot.set(doc(programme), {
+            nom, type: f.type.value, jour: "", heure: "", statut: "a_reserver", etoile: false,
+            prix: "", lien: "", note: "", auteur: f.auteur.value,
+            modifiePar: moi(), creeLe: serverTimestamp(), modifieLe: serverTimestamp(),
+          });
+        }
+        await lot.commit();
+      }
+      afficherMessage(
+        (nouveaux.length ? `✅ ${nouveaux.length} ${nouveaux.length > 1 ? "cartes créées" : "carte créée"} dans « Idées sans date, à placer ».` : "Aucune carte créée.")
+        + (ignores.length ? ` Déjà dans le programme : ${ignores.join(", ")}.` : "")
+      );
     } catch (erreur) {
       signalerErreur($("etat-programme"), erreur);
     }

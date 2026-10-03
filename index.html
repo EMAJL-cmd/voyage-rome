@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=11">
-  <script type="module" src="app.js?v=11"></script>
+  <link rel="stylesheet" href="style.css?v=12">
+  <script type="module" src="app.js?v=12"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -38,8 +38,8 @@
       </div>
       <p class="moi">
         Bonjour <strong id="prenom"></strong><br>
-        <button id="changer" class="lien" type="button">Ce n'est pas moi</button>
-        · <button class="lien ouvrir-guide" type="button">❓ Mode d'emploi</button>
+        <button id="changer" class="lien" type="button">Ce n'est pas moi</button><br>
+        <button class="lien ouvrir-guide" type="button">❓ Mode d'emploi</button>
       </p>
     </header>
 
@@ -55,6 +55,8 @@
           <h2>Programme</h2>
           <button id="ajouter-programme" class="bouton-principal" type="button">+ Ajouter</button>
         </div>
+        <button id="ajout-rapide-programme" class="lien-ressources" type="button">⚡ Ajouter plusieurs idées d'un coup</button>
+        <p id="message-programme" class="etat ok" hidden></p>
         <p id="etat-programme" class="etat" hidden></p>
         <div id="liste-programme"><p class="vide">Chargement du programme…</p></div>
       </section>
@@ -85,6 +87,34 @@
       <span class="place-bouton"></span>
     </div>
     <iframe id="cadre-guide" title="Mode d'emploi"></iframe>
+  </dialog>
+
+  <!-- Ajout rapide : plusieurs idées d'un coup, séparées par des virgules -->
+  <dialog id="fiche-rapide" class="fiche">
+    <form id="formulaire-rapide" method="dialog">
+      <div class="fiche-entete">
+        <button id="annuler-rapide" class="bouton-secondaire" type="button">Annuler</button>
+        <h2 tabindex="-1" autofocus>Ajout rapide</h2>
+        <button class="bouton-principal" type="submit">Créer</button>
+      </div>
+
+      <label>Noms des lieux, séparés par des virgules
+        <textarea name="noms" rows="5" maxlength="3000" required placeholder="Panthéon, Thermes de Caracalla, Ara Pacis"></textarea>
+      </label>
+
+      <fieldset class="choix-type">
+        <legend>Type</legend>
+        <label><input type="radio" name="type" value="visite" checked><span>🏛️ Visite</span></label>
+        <label><input type="radio" name="type" value="restaurant"><span>🍝 Restaurant</span></label>
+        <label><input type="radio" name="type" value="activite"><span>🎭 Activité</span></label>
+      </fieldset>
+
+      <label>Proposé par
+        <select name="auteur"></select>
+      </label>
+
+      <p class="aide-fiche">Une carte sera créée pour chaque nom, dans « Idées sans date, à placer ». Les lieux déjà présents dans le programme sont ignorés. Vous pourrez ensuite compléter chaque carte avec ✏️ Modifier.</p>
+    </form>
   </dialog>
 
   <!-- Formulaire d'ajout / de modification d'une idée du programme -->

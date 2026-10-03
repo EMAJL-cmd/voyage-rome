@@ -217,6 +217,18 @@ main {
   color: var(--accent);
 }
 
+.etat.ok {
+  padding: 12px;
+  border-radius: 12px;
+  background: #d8efdc;
+  color: #23662f;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .etat.ok { background: #1f3d25; color: #a4dcae; }
+}
+
 .etat.erreur {
   padding: 12px;
   border-radius: 12px;
