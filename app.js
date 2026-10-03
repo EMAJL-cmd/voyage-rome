@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch, setDoc, deleteField
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=20";
+import { firebaseConfig } from "./firebase-config.js?v=21";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -120,7 +120,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=20";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=21";
       $("fiche-guide").showModal();
     });
   }
@@ -540,12 +540,33 @@ async function enregistrerVote(changements) {
   }
 }
 
+// Le module de vote est plié par défaut ; il reste déplié tant qu'on ne le replie pas
+// (même quand l'affichage se met à jour après un vote).
+let voteDeplie = false;
+
 function blocVote() {
-  const bloc = el("section", "vote");
-  bloc.append(el("h3", "titre-vote", "🗳️ Quelle variante préférez-vous ?"));
+  const monVote = voteDe(moi());
+  const parVariante = {};
+  for (const v of Object.keys(VARIANTES)) parVariante[v] = VOYAGEURS.filter((p) => voteDe(p)?.variante === v);
+  const max = Math.max(...Object.values(parVariante).map((l) => l.length));
+  const enTete = Object.keys(VARIANTES).filter((v) => max > 0 && parVariante[v].length === max);
+  const nbVotes = VOYAGEURS.filter((p) => voteDe(p)).length;
+
+  const bloc = el("details", "vote");
+  bloc.open = voteDeplie;
+  bloc.addEventListener("toggle", () => { voteDeplie = bloc.open; });
+
+  // Ligne résumée, visible quand le module est plié.
+  const resume = el("summary", "resume-vote");
+  const etat = nbVotes === 0 ? "personne n'a encore voté"
+    : `${nbVotes}/${VOYAGEURS.length} ont voté · ` + (enTete.length === 1 ? `${enTete[0]} en tête` : `égalité ${enTete.join("-")}`);
+  resume.append(
+    el("span", "", "🗳️ Vote : " + etat),
+    el("span", "a-vous", monVote ? `vous : ${monVote.variante}` : "à vous !"),
+  );
+  bloc.append(resume);
 
   // Mon vote : un toucher pour choisir, un second pour annuler.
-  const monVote = voteDe(moi());
   const boutons = el("div", "boutons-vote");
   for (const v of Object.keys(VARIANTES)) {
     const choisi = monVote?.variante === v;
@@ -562,10 +583,6 @@ function blocVote() {
   bloc.append(boutons);
 
   // Résultats, en direct, avec les prénoms.
-  const parVariante = {};
-  for (const v of Object.keys(VARIANTES)) parVariante[v] = VOYAGEURS.filter((p) => voteDe(p)?.variante === v);
-  const max = Math.max(...Object.values(parVariante).map((l) => l.length));
-  const enTete = Object.keys(VARIANTES).filter((v) => max > 0 && parVariante[v].length === max);
 
   const resultats = el("ul", "resultats-vote");
   for (const [v, prenoms] of Object.entries(parVariante)) {

@@ -31,7 +31,7 @@ son ordinateur, **sans avoir à créer de compte**.
      activités planifiées propres à une variante. Titres des journées variables : documents `2026-12-27-A`…
      « ✅ Adopter la variante » supprime les activités planifiées absentes de la variante et rend le reste commun.
    - **Vote** : document `voyages/{code}/jours/votes`, un champ par prénom `{ variante, mot, le }`
-     (écrit avec `setDoc(..., { merge: true })`). Affiché sous le sélecteur ; supprimé à l'adoption.
+     (écrit avec `setDoc(..., { merge: true })`). Module plié par défaut (`<details>`), sous le sélecteur ; supprimé à l'adoption.
    - « ⚡ Ajouter plusieurs idées d'un coup » : des noms séparés par des virgules (ou retours à la ligne)
      créent une carte chacun dans « Idées sans date, à placer » ; les noms déjà présents (sans tenir compte
      des majuscules ni des accents) sont ignorés ; on choisit le type et « Proposé par ».

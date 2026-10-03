@@ -525,35 +525,67 @@ main {
   font-size: 1.15rem;
 }
 
-/* --- Vote pour une variante --- */
+/* --- Vote pour une variante (plié par défaut) --- */
 
 .vote {
-  margin-top: 12px;
-  padding: 12px 14px;
+  margin-top: 10px;
   border: 1px solid var(--trait);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--carte);
+  font-size: 0.9rem;
 }
 
-.titre-vote {
-  margin: 0 0 10px;
-  font-size: 1.05rem;
-  color: var(--texte);
+.resume-vote {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.resume-vote::-webkit-details-marker {
+  display: none;
+}
+
+.resume-vote::after {
+  content: "▾";
+  color: var(--accent);
+}
+
+.vote[open] .resume-vote::after {
+  content: "▴";
+}
+
+.a-vous {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vote > :not(summary) {
+  margin-left: 12px;
+  margin-right: 12px;
 }
 
 .boutons-vote {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .bouton-vote {
   flex: 1;
-  min-height: 48px;
+  min-height: 40px;
   border: 2px solid var(--accent);
-  border-radius: 12px;
+  border-radius: 10px;
   background: none;
   color: var(--accent);
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -564,18 +596,17 @@ main {
 
 .resultats-vote {
   list-style: none;
-  margin: 14px 0 6px;
+  margin: 10px 12px 4px;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .resultats-vote li {
   display: grid;
-  grid-template-columns: 1.4em 70px 1fr;
+  grid-template-columns: 1.2em 56px 1fr;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
 }
 
 .lettre-vote {
@@ -583,8 +614,8 @@ main {
 }
 
 .barre-vote {
-  height: 10px;
-  border-radius: 5px;
+  height: 8px;
+  border-radius: 4px;
   background: var(--accent-doux);
   overflow: hidden;
 }
@@ -597,37 +628,42 @@ main {
 
 .mots-vote {
   list-style: none;
-  margin: 8px 0;
+  margin-top: 6px;
+  margin-bottom: 6px;
   padding: 0;
-  font-size: 0.9rem;
   font-style: italic;
 }
 
 .mots-vote li {
-  margin: 4px 0;
+  margin: 3px 0;
 }
 
 .mot-vote {
   display: flex;
-  gap: 8px;
-  margin: 8px 0;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .mot-vote input {
   flex: 1;
   min-width: 0;
-  min-height: 44px;
+  min-height: 40px;
   padding: 0 10px;
   border: 1px solid var(--trait);
   border-radius: 10px;
   background: var(--fond);
   color: var(--texte);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 16px;
 }
 
 .mot-vote .bouton-secondaire {
-  min-height: 44px;
+  min-height: 40px;
+}
+
+.vote > p.discret:last-child {
+  margin-bottom: 10px;
 }
 
 .adopter {
