@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch, setDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=18";
+import { firebaseConfig } from "./firebase-config.js?v=19";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -28,10 +28,12 @@ const STATUT_SUIVANT = {
 };
 const JOURS = ["2026-12-26", "2026-12-27", "2026-12-28", "2026-12-29", "2026-12-30"];
 
-// Deux variantes du programme. Une activité a « variante » = "A", "B", ou "" (commune aux deux).
+// Variantes du programme. Le champ « variante » d'une activité liste les variantes où elle figure :
+// "A", "BC", "AB"… ou "" quand elle est commune à toutes.
 const VARIANTES = {
   A: "Rome antique en profondeur",
   B: "Antique concentré + baroque",
+  C: "Rome baroque uniquement",
 };
 
 // Le code secret du voyage est la partie de l'adresse après « # ».
@@ -118,7 +120,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=18";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=19";
       $("fiche-guide").showModal();
     });
   }
@@ -369,12 +371,21 @@ function ouvrirFiche(idee) {
   f.prix.value = i.prix || "";
   f.lien.value = i.lien || "";
   f.note.value = i.note || "";
-  $("choix-variante").hidden = !ilYADesVariantes() && !VARIANTES[i.variante];
+  $("choix-variante").hidden = !ilYADesVariantes() && !variantesDe(i).length;
+  // Toutes les combinaisons : chaque variante seule, puis chaque paire…
+  const lettres = Object.keys(VARIANTES);
+  const combinaisons = [];
+  for (let masque = 1; masque < (1 << lettres.length) - 1; masque++) {
+    combinaisons.push(lettres.filter((_, n) => masque & (1 << n)).join(""));
+  }
+  combinaisons.sort((x, y) => x.length - y.length || x.localeCompare(y));
   f.variante.replaceChildren(
-    new Option("Commune aux deux variantes", ""),
-    ...Object.entries(VARIANTES).map(([v, nom]) => new Option(`Variante ${v} seulement · ${nom}`, v)),
+    new Option("Commune à toutes les variantes", ""),
+    ...combinaisons.map((c) => new Option(c.length === 1
+      ? `Variante ${c} seulement · ${VARIANTES[c]}`
+      : `Variantes ${c.split("").join(" et ")}`, c)),
   );
-  f.variante.value = VARIANTES[i.variante] ? i.variante : "";
+  f.variante.value = variantesDe(i).join("");
   $("auteur-fiche-programme").textContent = idee?.auteur ? `Proposé par ${idee.auteur}` : "";
   $("retirer-programme").hidden = !idee || !affectee;
   $("supprimer-programme").hidden = !idee || affectee;
@@ -452,18 +463,25 @@ function varianteChoisie() {
   return VARIANTES[v] ? v : "A";
 }
 
+// Les variantes où figure une activité ([] = commune à toutes).
+function variantesDe(idee) {
+  const liste = [...new Set((idee.variante || "").split(""))].filter((v) => VARIANTES[v]);
+  return liste.length === Object.keys(VARIANTES).length ? [] : liste;
+}
+
 function ilYADesVariantes() {
-  return idees.some((i) => JOURS.includes(i.jour) && VARIANTES[i.variante]);
+  return idees.some((i) => JOURS.includes(i.jour) && variantesDe(i).length);
 }
 
-// Une activité planifiée propre à l'autre variante est masquée ; le reste est toujours visible.
+// Une activité planifiée absente de la variante choisie est masquée ; le reste est toujours visible.
 function visible(idee) {
-  return !JOURS.includes(idee.jour) || !VARIANTES[idee.variante] || idee.variante === varianteChoisie();
+  const liste = variantesDe(idee);
+  return !JOURS.includes(idee.jour) || liste.length === 0 || liste.includes(varianteChoisie());
 }
 
-// Une journée « variable » contient des activités propres à une variante.
+// Une journée « variable » contient des activités qui ne sont pas dans toutes les variantes.
 function jourVariable(jour) {
-  return idees.some((i) => i.jour === jour && VARIANTES[i.variante]);
+  return idees.some((i) => i.jour === jour && variantesDe(i).length);
 }
 
 // Le titre d'une journée variable dépend de la variante (document « 2026-12-27-A »…).
@@ -489,7 +507,8 @@ function afficherSelecteurVariantes() {
   choix.setAttribute("role", "group");
   choix.setAttribute("aria-label", "Variante du programme");
   for (const [v, nom] of Object.entries(VARIANTES)) {
-    const bouton = el("button", "", `${v} · ${nom}`);
+    const bouton = el("button");
+    bouton.append(el("b", "", v), el("span", "", nom));
     bouton.type = "button";
     bouton.setAttribute("aria-pressed", String(v === varianteChoisie()));
     bouton.addEventListener("click", () => {
@@ -501,22 +520,22 @@ function afficherSelecteurVariantes() {
   const adopter = el("button", "lien adopter", `✅ Adopter la variante ${varianteChoisie()}…`);
   adopter.type = "button";
   adopter.addEventListener("click", adopterVariante);
-  zone.append(el("p", "discret legende-variantes", "Deux variantes du programme : le 27 et le 30 changent, le reste est commun."), choix, adopter);
+  zone.append(el("p", "discret legende-variantes",
+    `${Object.keys(VARIANTES).length} variantes du programme : les journées marquées « Variante » changent, le reste est commun.`), choix, adopter);
 }
 
 // Garde la variante choisie et supprime les activités planifiées de l'autre.
 async function adopterVariante() {
   const v = varianteChoisie();
-  const autre = v === "A" ? "B" : "A";
-  const aSupprimer = idees.filter((i) => i.variante === autre && JOURS.includes(i.jour));
+  const aSupprimer = idees.filter((i) => JOURS.includes(i.jour) && variantesDe(i).length && !variantesDe(i).includes(v));
   if (!confirm(`Adopter la variante ${v} « ${VARIANTES[v]} » pour toute la famille ?\n\n`
-    + `Les ${aSupprimer.length} activités propres à la variante ${autre} seront supprimées définitivement.`)) return;
+    + `Les ${aSupprimer.length} activités qui ne font pas partie de la variante ${v} seront supprimées définitivement.`)) return;
 
   const programme = collection(db, "voyages", code, "programme");
   const jours = collection(db, "voyages", code, "jours");
   const lot = writeBatch(db);
   for (const i of aSupprimer) lot.delete(doc(programme, i.id));
-  for (const i of idees.filter((i) => VARIANTES[i.variante] && !aSupprimer.includes(i))) {
+  for (const i of idees.filter((i) => i.variante && !aSupprimer.includes(i))) {
     lot.update(doc(programme, i.id), { variante: "", modifiePar: moi(), modifieLe: serverTimestamp() });
   }
   for (const jour of JOURS) {
@@ -546,7 +565,7 @@ function ecouterTitresJours() {
     (resultat) => {
       titresJours = {};
       for (const d of resultat.docs) {
-        const jour = d.id.replace(/-[AB]$/, "");
+        const jour = d.id.replace(/-[A-Z]$/, "");
         if (JOURS.includes(jour) && d.data().titre) titresJours[d.id] = d.data().titre;
       }
       afficherProgramme();
@@ -842,7 +861,8 @@ function ouvrirFicheRessource(ressource) {
   const choix = [new Option("Aucune (pour tout le voyage)", "")];
   for (const idee of ideesDansLOrdre()) {
     const jour = JOURS.includes(idee.jour) ? jourLisible(idee.jour).split(" ").slice(0, 2).join(" ") + " · " : "";
-    const variante = VARIANTES[idee.variante] ? ` (variante ${idee.variante})` : "";
+    const liste = variantesDe(idee);
+    const variante = liste.length ? ` (variante${liste.length > 1 ? "s" : ""} ${liste.join(", ")})` : "";
     choix.push(new Option(jour + (idee.nom || "(sans nom)") + variante, idee.id));
   }
   f.visite.replaceChildren(...choix);

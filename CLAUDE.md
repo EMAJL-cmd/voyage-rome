@@ -25,7 +25,8 @@ son ordinateur, **sans avoir à créer de compte**.
      **🗂️ Détail** (les cartes). Toucher une journée ou une activité de l'aperçu ouvre le détail à cet endroit.
    - Titres de journées (« Vatican »…) : collection `voyages/{code}/jours`, un document par date
      (identifiant `2026-12-26`…) avec `titre`. Affichés dans l'aperçu et le détail, modifiables par ✏️ dans le détail.
-   - **Variantes** : champ `variante` d'une activité = "A", "B" ou "" (commune). Noms dans `VARIANTES` (app.js).
+   - **Variantes** (A, B, C) : le champ `variante` d'une activité liste les lettres des variantes où elle figure
+     ("A", "BC", "AB"…) ou "" si elle est commune à toutes. Noms dans `VARIANTES` (app.js).
      Sélecteur en haut du Programme (choix mémorisé sur l'appareil), visible seulement s'il existe des
      activités planifiées propres à une variante. Titres des journées variables : documents `2026-12-27-A`…
      « ✅ Adopter la variante » supprime les activités planifiées de l'autre et rend la variante commune.
