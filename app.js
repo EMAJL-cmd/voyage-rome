@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch, setDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=17";
+import { firebaseConfig } from "./firebase-config.js?v=18";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -27,6 +27,12 @@ const STATUT_SUIVANT = {
   fait: "a_reserver",
 };
 const JOURS = ["2026-12-26", "2026-12-27", "2026-12-28", "2026-12-29", "2026-12-30"];
+
+// Deux variantes du programme. Une activité a « variante » = "A", "B", ou "" (commune aux deux).
+const VARIANTES = {
+  A: "Rome antique en profondeur",
+  B: "Antique concentré + baroque",
+};
 
 // Le code secret du voyage est la partie de l'adresse après « # ».
 // Il n'est jamais envoyé à GitHub, seulement à la base de données.
@@ -112,7 +118,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=17";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=18";
       $("fiche-guide").showModal();
     });
   }
@@ -257,6 +263,7 @@ function demarrerProgramme() {
       prix: f.prix.value.trim(),
       lien: f.lien.value.trim(),
       note: f.note.value.trim(),
+      variante: f.variante.value,
       modifiePar: moi(),
       modifieLe: serverTimestamp(),
     };
@@ -362,6 +369,12 @@ function ouvrirFiche(idee) {
   f.prix.value = i.prix || "";
   f.lien.value = i.lien || "";
   f.note.value = i.note || "";
+  $("choix-variante").hidden = !ilYADesVariantes() && !VARIANTES[i.variante];
+  f.variante.replaceChildren(
+    new Option("Commune aux deux variantes", ""),
+    ...Object.entries(VARIANTES).map(([v, nom]) => new Option(`Variante ${v} seulement · ${nom}`, v)),
+  );
+  f.variante.value = VARIANTES[i.variante] ? i.variante : "";
   $("auteur-fiche-programme").textContent = idee?.auteur ? `Proposé par ${idee.auteur}` : "";
   $("retirer-programme").hidden = !idee || !affectee;
   $("supprimer-programme").hidden = !idee || affectee;
@@ -405,8 +418,9 @@ function afficherProgramme() {
     (b.etoile ? 1 : 0) - (a.etoile ? 1 : 0) ||
     (a.nom || "").localeCompare(b.nom || "", "fr");
 
+  afficherSelecteurVariantes();
   const groupes = [
-    ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour), jour]),
+    ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour && visible(i)), jour]),
     ["Idées sans date, à placer", idees.filter((i) => !JOURS.includes(i.jour)), "sans-date"],
   ];
 
@@ -416,8 +430,10 @@ function afficherProgramme() {
     h3.id = "jour-" + repere;
     h3.append(el("span", "", titre));
     if (JOURS.includes(repere)) {
-      if (titresJours[repere]) h3.append(el("span", "theme-jour", titresJours[repere]));
-      const modifier = el("button", "modifier-titre", titresJours[repere] ? "✏️" : "✏️ Donner un titre");
+      const etiquette = etiquetteVariante(repere);
+      if (etiquette) h3.append(etiquette);
+      if (titreDuJour(repere)) h3.append(el("span", "theme-jour", titreDuJour(repere)));
+      const modifier = el("button", "modifier-titre", titreDuJour(repere) ? "✏️" : "✏️ Donner un titre");
       modifier.type = "button";
       modifier.setAttribute("aria-label", "Titre de la journée");
       modifier.addEventListener("click", () => ouvrirFicheJour(repere));
@@ -427,6 +443,95 @@ function afficherProgramme() {
     for (const idee of elements.sort(ordre)) liste.append(carteIdee(idee));
   }
   afficherApercu(ordre);
+}
+
+/* ---------- Programme : variantes ---------- */
+
+function varianteChoisie() {
+  const v = lire("variante");
+  return VARIANTES[v] ? v : "A";
+}
+
+function ilYADesVariantes() {
+  return idees.some((i) => JOURS.includes(i.jour) && VARIANTES[i.variante]);
+}
+
+// Une activité planifiée propre à l'autre variante est masquée ; le reste est toujours visible.
+function visible(idee) {
+  return !JOURS.includes(idee.jour) || !VARIANTES[idee.variante] || idee.variante === varianteChoisie();
+}
+
+// Une journée « variable » contient des activités propres à une variante.
+function jourVariable(jour) {
+  return idees.some((i) => i.jour === jour && VARIANTES[i.variante]);
+}
+
+// Le titre d'une journée variable dépend de la variante (document « 2026-12-27-A »…).
+function cleTitre(jour) {
+  return jourVariable(jour) ? jour + "-" + varianteChoisie() : jour;
+}
+
+function titreDuJour(jour) {
+  return titresJours[cleTitre(jour)] || titresJours[jour] || "";
+}
+
+function etiquetteVariante(jour) {
+  return jourVariable(jour) ? el("span", "etiquette-variante", "Variante " + varianteChoisie()) : null;
+}
+
+function afficherSelecteurVariantes() {
+  const zone = $("variantes-programme");
+  zone.replaceChildren();
+  zone.hidden = !ilYADesVariantes();
+  if (zone.hidden) return;
+
+  const choix = el("div", "vues variantes");
+  choix.setAttribute("role", "group");
+  choix.setAttribute("aria-label", "Variante du programme");
+  for (const [v, nom] of Object.entries(VARIANTES)) {
+    const bouton = el("button", "", `${v} · ${nom}`);
+    bouton.type = "button";
+    bouton.setAttribute("aria-pressed", String(v === varianteChoisie()));
+    bouton.addEventListener("click", () => {
+      ecrire("variante", v);
+      afficherProgramme();
+    });
+    choix.append(bouton);
+  }
+  const adopter = el("button", "lien adopter", `✅ Adopter la variante ${varianteChoisie()}…`);
+  adopter.type = "button";
+  adopter.addEventListener("click", adopterVariante);
+  zone.append(el("p", "discret legende-variantes", "Deux variantes du programme : le 27 et le 30 changent, le reste est commun."), choix, adopter);
+}
+
+// Garde la variante choisie et supprime les activités planifiées de l'autre.
+async function adopterVariante() {
+  const v = varianteChoisie();
+  const autre = v === "A" ? "B" : "A";
+  const aSupprimer = idees.filter((i) => i.variante === autre && JOURS.includes(i.jour));
+  if (!confirm(`Adopter la variante ${v} « ${VARIANTES[v]} » pour toute la famille ?\n\n`
+    + `Les ${aSupprimer.length} activités propres à la variante ${autre} seront supprimées définitivement.`)) return;
+
+  const programme = collection(db, "voyages", code, "programme");
+  const jours = collection(db, "voyages", code, "jours");
+  const lot = writeBatch(db);
+  for (const i of aSupprimer) lot.delete(doc(programme, i.id));
+  for (const i of idees.filter((i) => VARIANTES[i.variante] && !aSupprimer.includes(i))) {
+    lot.update(doc(programme, i.id), { variante: "", modifiePar: moi(), modifieLe: serverTimestamp() });
+  }
+  for (const jour of JOURS) {
+    const titre = titresJours[jour + "-" + v];
+    if (titre) lot.set(doc(jours, jour), { titre, modifiePar: moi(), modifieLe: serverTimestamp() });
+    for (const x of Object.keys(VARIANTES)) {
+      if (titresJours[jour + "-" + x]) lot.delete(doc(jours, jour + "-" + x));
+    }
+  }
+  try {
+    await lot.commit();
+    afficherMessage(`✅ Variante ${v} adoptée : c'est maintenant le programme du séjour.`);
+  } catch (erreur) {
+    signalerErreur($("etat-programme"), erreur);
+  }
 }
 
 /* ---------- Programme : titres des journées ---------- */
@@ -441,7 +546,8 @@ function ecouterTitresJours() {
     (resultat) => {
       titresJours = {};
       for (const d of resultat.docs) {
-        if (JOURS.includes(d.id) && d.data().titre) titresJours[d.id] = d.data().titre;
+        const jour = d.id.replace(/-[AB]$/, "");
+        if (JOURS.includes(jour) && d.data().titre) titresJours[d.id] = d.data().titre;
       }
       afficherProgramme();
     },
@@ -476,9 +582,10 @@ function demarrerTitresJours() {
 }
 
 function ouvrirFicheJour(jour) {
-  jourOuvert = jour;
-  $("date-fiche-jour").textContent = jourLisible(jour);
-  $("formulaire-jour").elements.titre.value = titresJours[jour] || "";
+  jourOuvert = cleTitre(jour);
+  $("date-fiche-jour").textContent = jourLisible(jour)
+    + (jourVariable(jour) ? " · Variante " + varianteChoisie() : "");
+  $("formulaire-jour").elements.titre.value = titreDuJour(jour);
   $("fiche-jour").showModal();
 }
 
@@ -517,7 +624,7 @@ function afficherApercu(ordre) {
   apercu.replaceChildren();
   if (idees.length === 0) return;
 
-  const planifiees = idees.filter((i) => JOURS.includes(i.jour));
+  const planifiees = idees.filter((i) => JOURS.includes(i.jour) && visible(i));
   const aReserver = planifiees.filter((i) => i.statut === "a_reserver");
 
   // Compteur des réservations : un toucher n'affiche qu'elles.
@@ -547,7 +654,9 @@ function afficherApercu(ordre) {
     const titre = el("button", "titre-apercu");
     titre.type = "button";
     const date = el("span", "date-apercu", jourLisible(jour));
-    if (titresJours[jour]) date.append(el("span", "theme-jour", titresJours[jour]));
+    const etiquette = etiquetteVariante(jour);
+    if (etiquette) date.append(" ", etiquette);
+    if (titreDuJour(jour)) date.append(el("span", "theme-jour", titreDuJour(jour)));
     titre.append(date, el("span", "fleche", "›"));
     titre.addEventListener("click", () => allerAuDetail("jour-" + jour));
     bloc.append(titre);
@@ -733,7 +842,8 @@ function ouvrirFicheRessource(ressource) {
   const choix = [new Option("Aucune (pour tout le voyage)", "")];
   for (const idee of ideesDansLOrdre()) {
     const jour = JOURS.includes(idee.jour) ? jourLisible(idee.jour).split(" ").slice(0, 2).join(" ") + " · " : "";
-    choix.push(new Option(jour + (idee.nom || "(sans nom)"), idee.id));
+    const variante = VARIANTES[idee.variante] ? ` (variante ${idee.variante})` : "";
+    choix.push(new Option(jour + (idee.nom || "(sans nom)") + variante, idee.id));
   }
   f.visite.replaceChildren(...choix);
   f.visite.value = idees.some((i) => i.id === r.visite) ? r.visite : "";
