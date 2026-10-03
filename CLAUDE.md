@@ -69,7 +69,7 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - [x] Étape 0 — Préparatifs : dossier du projet, compte GitHub, projet Firebase
 - [x] Étape 1 — Page « Bonjour Rome » publiée sur GitHub Pages et ouverte sur téléphone
 - [x] Étape 2 — Branchement de Firebase et test de partage avec un membre de la famille
-- [ ] Étape 3 — Squelette : 3 onglets, choix « Qui êtes-vous ? »
+- [x] Étape 3 — Squelette : 3 onglets, choix « Qui êtes-vous ? »
 - [ ] Étape 4 — Programme
 - [ ] Étape 5 — À lire / à voir
 - [ ] Étape 6 — Infos pratiques
