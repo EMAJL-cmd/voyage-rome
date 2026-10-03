@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=3">
-  <script type="module" src="app.js?v=3"></script>
+  <link rel="stylesheet" href="style.css?v=4">
+  <script type="module" src="app.js?v=4"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -49,8 +49,12 @@
 
     <main>
       <section id="programme" class="rubrique">
-        <h2>Programme</h2>
-        <p class="vide">Bientôt ici : les visites, restaurants et activités du voyage.</p>
+        <div class="titre-rubrique">
+          <h2>Programme</h2>
+          <button id="ajouter-programme" class="bouton-principal" type="button">+ Ajouter</button>
+        </div>
+        <p id="etat-programme" class="etat" hidden></p>
+        <div id="liste-programme"><p class="vide">Chargement du programme…</p></div>
       </section>
       <section id="ressources" class="rubrique">
         <h2>À lire / à voir</h2>
@@ -62,5 +66,73 @@
       </section>
     </main>
   </div>
+
+  <!-- Formulaire d'ajout / de modification d'une idée du programme -->
+  <dialog id="fiche-programme" class="fiche">
+    <form id="formulaire-programme" method="dialog">
+      <h2 id="titre-fiche-programme">Nouvelle idée</h2>
+
+      <label>Nom
+        <input name="nom" type="text" maxlength="120" required placeholder="Ex. : Colisée">
+      </label>
+
+      <fieldset class="choix-type">
+        <legend>Type</legend>
+        <label><input type="radio" name="type" value="visite" checked><span>🏛️ Visite</span></label>
+        <label><input type="radio" name="type" value="restaurant"><span>🍝 Restaurant</span></label>
+        <label><input type="radio" name="type" value="activite"><span>🎭 Activité</span></label>
+      </fieldset>
+
+      <div class="deux-colonnes">
+        <label>Jour
+          <select name="jour">
+            <option value="">Pas encore fixé</option>
+            <option value="2026-12-26">Sam. 26 déc.</option>
+            <option value="2026-12-27">Dim. 27 déc.</option>
+            <option value="2026-12-28">Lun. 28 déc.</option>
+            <option value="2026-12-29">Mar. 29 déc.</option>
+            <option value="2026-12-30">Mer. 30 déc.</option>
+          </select>
+        </label>
+        <label>Heure
+          <input name="heure" type="time">
+        </label>
+      </div>
+
+      <label>Statut
+        <select name="statut">
+          <option value="a_reserver">🟠 À réserver</option>
+          <option value="reserve">🔵 Réservé</option>
+          <option value="libre">⚪ Sans réservation</option>
+          <option value="fait">🟢 Fait</option>
+        </select>
+      </label>
+
+      <label class="case">
+        <input name="etoile" type="checkbox"> ⭐ Incontournable
+      </label>
+
+      <label>Prix (facultatif)
+        <input name="prix" type="text" maxlength="60" placeholder="Ex. : 18 € par personne">
+      </label>
+
+      <label>Lien (facultatif)
+        <input name="lien" type="url" maxlength="500" placeholder="https://…">
+      </label>
+
+      <label>Note (facultatif)
+        <textarea name="note" rows="3" maxlength="1000"></textarea>
+      </label>
+
+      <p id="auteur-fiche-programme" class="discret"></p>
+
+      <div class="actions">
+        <button id="supprimer-programme" class="bouton-danger" type="button">Supprimer</button>
+        <span class="espace"></span>
+        <button id="annuler-programme" class="bouton-secondaire" type="button">Annuler</button>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>

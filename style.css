@@ -189,6 +189,284 @@ main {
   font-style: italic;
 }
 
+/* --- Boutons communs --- */
+
+.bouton-principal,
+.bouton-secondaire,
+.bouton-danger {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.bouton-principal {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+}
+
+.bouton-secondaire {
+  border: 1px solid var(--trait);
+  background: var(--carte);
+}
+
+.bouton-danger {
+  border: 1px solid var(--accent);
+  background: none;
+  color: var(--accent);
+}
+
+.etat.erreur {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--accent-doux);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.discret {
+  color: var(--discret);
+  font-size: 0.85rem;
+}
+
+/* --- Programme --- */
+
+.titre-rubrique {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.titre-jour {
+  margin: 28px 0 10px;
+  font-size: 1.05rem;
+  color: var(--texte);
+  border-bottom: 2px solid var(--accent-doux);
+  padding-bottom: 4px;
+}
+
+.carte {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--trait);
+  border-radius: 14px;
+  background: var(--carte);
+}
+
+.carte.faite {
+  opacity: 0.65;
+}
+
+.carte-haut {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.carte-titre {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  text-align: left;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.carte-titre .heure {
+  flex: none;
+  color: var(--accent);
+}
+
+.etoile {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: none;
+  background: none;
+  font-size: 1.4rem;
+  color: var(--discret);
+}
+
+.details {
+  margin: 0;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.note {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  white-space: pre-line;
+}
+
+.lien-externe {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 0;
+  color: var(--accent);
+}
+
+.carte-bas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.statut {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.statut-a_reserver { background: #fbe3cc; color: #8a4b0f; }
+.statut-reserve { background: #d9e6fb; color: #1f4c8f; }
+.statut-libre { background: #ece7e1; color: #5d5148; }
+.statut-fait { background: #d8efdc; color: #23662f; }
+
+@media (prefers-color-scheme: dark) {
+  .statut-a_reserver { background: #4a3017; color: #f6c48f; }
+  .statut-reserve { background: #1f3352; color: #a9c6f5; }
+  .statut-libre { background: #3a332d; color: #d8cdc1; }
+  .statut-fait { background: #1f3d25; color: #a4dcae; }
+}
+
+/* --- Fiche (formulaire) --- */
+
+.fiche {
+  width: min(560px, calc(100% - 16px));
+  max-height: calc(100% - 32px);
+  padding: 0;
+  border: none;
+  border-radius: 18px;
+  background: var(--fond);
+  color: var(--texte);
+}
+
+.fiche::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.fiche form {
+  display: grid;
+  gap: 14px;
+  padding: 20px 16px;
+}
+
+.fiche h2 {
+  margin: 0;
+}
+
+.fiche label {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.fiche input[type="text"],
+.fiche input[type="url"],
+.fiche input[type="time"],
+.fiche select,
+.fiche textarea {
+  font: inherit;
+  font-weight: normal;
+  min-height: 48px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--trait);
+  border-radius: 10px;
+  background: var(--carte);
+  color: var(--texte);
+}
+
+.fiche fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.fiche legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.choix-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choix-type label {
+  display: block;
+}
+
+.choix-type input {
+  position: absolute;
+  opacity: 0;
+}
+
+.choix-type span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--trait);
+  border-radius: 22px;
+  background: var(--carte);
+  font-weight: normal;
+}
+
+.choix-type input:checked + span {
+  border-color: var(--accent);
+  background: var(--accent-doux);
+  font-weight: 700;
+}
+
+.choix-type input:focus-visible + span {
+  outline: 2px solid var(--accent);
+}
+
+.deux-colonnes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fiche label.case {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.case input {
+  width: 22px;
+  height: 22px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actions .espace {
+  flex: 1;
+}
+
 /* --- Ordinateur : onglets en haut --- */
 
 @media (min-width: 768px) {
