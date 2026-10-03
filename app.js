@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=9";
+import { firebaseConfig } from "./firebase-config.js?v=10";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -169,13 +169,14 @@ function demarrerProgramme() {
   $("annuler-programme").addEventListener("click", () => fiche.close());
 
   // « Retirer » ne supprime rien : l'idée va dans « Idées sans date, à placer », en bas du programme,
-  // avec toutes ses informations. On la remet au programme en lui redonnant un jour.
+  // avec toutes ses informations. Son ancien jour est gardé dans « jourAvant » : il est
+  // proposé par défaut quand on la remet au programme.
   $("retirer-programme").addEventListener("click", async () => {
     if (!ideeOuverte) return;
     fiche.close();
     try {
       await updateDoc(doc(programme, ideeOuverte.id), {
-        jour: "", modifiePar: moi(), modifieLe: serverTimestamp(),
+        jour: "", jourAvant: ideeOuverte.jour, modifiePar: moi(), modifieLe: serverTimestamp(),
       });
     } catch (erreur) {
       signalerErreur($("etat-programme"), erreur);
@@ -231,11 +232,13 @@ function ouvrirFiche(idee) {
   const affectee = JOURS.includes(i.jour);
   $("titre-fiche-programme").textContent = !idee ? "Nouvelle idée" : affectee ? "Modifier" : "Remettre au programme";
   $("aide-fiche-programme").textContent = idee && !affectee
-    ? "Choisissez un jour (et une heure), puis « Enregistrer » : l'idée reprendra sa place dans le programme."
+    ? (JOURS.includes(i.jourAvant)
+      ? "Le jour et l'heure d'avant sont déjà remplis. Touchez « Enregistrer » pour remettre l'idée à sa place, ou changez-les."
+      : "Choisissez un jour (et une heure), puis « Enregistrer » : l'idée reprendra sa place dans le programme.")
     : "";
   f.nom.value = i.nom || "";
   f.type.value = TYPES[i.type] ? i.type : "visite";
-  f.jour.value = JOURS.includes(i.jour) ? i.jour : "";
+  f.jour.value = JOURS.includes(i.jour) ? i.jour : JOURS.includes(i.jourAvant) ? i.jourAvant : "";
   f.heure.value = i.heure || "";
   f.statut.value = STATUTS[i.statut] ? i.statut : "a_reserver";
   f.etoile.checked = Boolean(i.etoile);
@@ -316,6 +319,10 @@ function carteIdee(idee) {
   haut.append(ouvrir, etoile);
   carte.append(haut);
 
+  if (!JOURS.includes(idee.jour) && JOURS.includes(idee.jourAvant)) {
+    carte.append(el("p", "discret", "Prévu avant : " + jourLisible(idee.jourAvant)
+      + (idee.heure ? " · " + idee.heure.replace(":", "h") : "")));
+  }
   if (idee.prix) carte.append(el("p", "details", idee.prix));
   if (idee.note) carte.append(el("p", "note", idee.note));
 

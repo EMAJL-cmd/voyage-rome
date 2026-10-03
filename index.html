@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=9">
-  <script type="module" src="app.js?v=9"></script>
+  <link rel="stylesheet" href="style.css?v=10">
+  <script type="module" src="app.js?v=10"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -78,7 +78,12 @@
   <!-- Formulaire d'ajout / de modification d'une idée du programme -->
   <dialog id="fiche-programme" class="fiche">
     <form id="formulaire-programme" method="dialog">
-      <h2 id="titre-fiche-programme">Nouvelle idée</h2>
+      <div class="fiche-entete">
+        <button id="annuler-programme" class="bouton-secondaire" type="button">Annuler</button>
+        <h2 id="titre-fiche-programme" tabindex="-1" autofocus>Nouvelle idée</h2>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
+      <p id="aide-fiche-programme" class="aide-fiche"></p>
 
       <label>Nom
         <input name="nom" type="text" maxlength="120" required placeholder="Ex. : Colisée">
@@ -133,14 +138,10 @@
       </label>
 
       <p id="auteur-fiche-programme" class="discret"></p>
-      <p id="aide-fiche-programme" class="aide-fiche"></p>
 
       <div class="actions">
         <button id="retirer-programme" class="bouton-danger" type="button">Retirer du programme</button>
         <button id="supprimer-programme" class="bouton-danger" type="button">Supprimer définitivement</button>
-        <span class="espace"></span>
-        <button id="annuler-programme" class="bouton-secondaire" type="button">Annuler</button>
-        <button class="bouton-principal" type="submit">Enregistrer</button>
       </div>
     </form>
   </dialog>
@@ -148,7 +149,11 @@
   <!-- Formulaire d'ajout / de modification d'une ressource (article, vidéo…) -->
   <dialog id="fiche-ressources" class="fiche">
     <form id="formulaire-ressources" method="dialog">
-      <h2 id="titre-fiche-ressources">Nouvelle ressource</h2>
+      <div class="fiche-entete">
+        <button id="annuler-ressources" class="bouton-secondaire" type="button">Annuler</button>
+        <h2 id="titre-fiche-ressources" tabindex="-1" autofocus>Nouvelle ressource</h2>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
 
       <fieldset class="choix-type">
         <legend>Type</legend>
@@ -178,9 +183,6 @@
 
       <div class="actions">
         <button id="supprimer-ressources" class="bouton-danger" type="button">Supprimer</button>
-        <span class="espace"></span>
-        <button id="annuler-ressources" class="bouton-secondaire" type="button">Annuler</button>
-        <button class="bouton-principal" type="submit">Enregistrer</button>
       </div>
     </form>
   </dialog>
@@ -188,7 +190,11 @@
   <!-- Formulaire d'ajout / de modification d'une info pratique -->
   <dialog id="fiche-infos" class="fiche">
     <form id="formulaire-infos" method="dialog">
-      <h2 id="titre-fiche-infos">Nouvelle info</h2>
+      <div class="fiche-entete">
+        <button id="annuler-infos" class="bouton-secondaire" type="button">Annuler</button>
+        <h2 id="titre-fiche-infos" tabindex="-1" autofocus>Nouvelle info</h2>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
 
       <fieldset class="choix-type">
         <legend>Catégorie</legend>
@@ -233,9 +239,6 @@
 
       <div class="actions">
         <button id="supprimer-infos" class="bouton-danger" type="button">Supprimer</button>
-        <span class="espace"></span>
-        <button id="annuler-infos" class="bouton-secondaire" type="button">Annuler</button>
-        <button class="bouton-principal" type="submit">Enregistrer</button>
       </div>
     </form>
   </dialog>

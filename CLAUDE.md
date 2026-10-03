@@ -18,7 +18,7 @@ son ordinateur, **sans avoir à créer de compte**.
    - Une étoile « prioritaire » (pour les incontournables de Solange)
    - Date, heure, prix, lien et note facultatifs, et le nom de la personne qui a fait la proposition
    - « Retirer du programme » ne supprime pas : l'idée passe dans « Idées sans date, à placer » (en bas), avec toutes
-     ses informations. On la remet au programme en lui redonnant un jour. La suppression définitive
+     ses informations, et son ancien jour est gardé (`jourAvant`) : il est pré-rempli quand on la remet au programme. La suppression définitive
      n'est proposée que pour une idée déjà « Idées sans date, à placer ».
 2. **À lire / à voir** : articles, vidéos et livres partagés, qu'on peut rattacher à une visite
    du Programme. Chaque personne coche « lu / vu ».
@@ -61,6 +61,8 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - Interface en français, dates au format `26 déc.`
 - Concevoir d'abord pour le téléphone (≈ 375 px), puis vérifier sur ordinateur.
 - Gros boutons faciles à toucher (Solange doit s'y retrouver).
+- Formulaires : plein écran sur téléphone, « Annuler » et « Enregistrer » dans un en-tête collant en haut
+  (toujours visibles clavier ouvert). Le clavier ne doit pas s'ouvrir tout seul à l'ouverture d'un formulaire.
 - **Sécurité** : toute personne qui a le lien peut lire et modifier les données. Ne jamais y stocker
   de numéros de passeport, de carte bancaire ni de mots de passe. Les numéros de réservation sont
   acceptables.
