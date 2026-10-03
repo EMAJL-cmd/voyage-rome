@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Icône de l'application : un Colisée stylisé sur fond terracotta -->
+  <rect width="512" height="512" fill="#b5462b"/>
+  <!-- Silhouette du Colisée, avec le haut « en ruine » à droite -->
+  <path d="M92 404 V138 H292 L318 160 H352 L372 186 H420 V404 Z" fill="#fbf6ee"/>
+  <!-- Arcades : trois étages -->
+  <g fill="#b5462b">
+    <!-- Étage du bas -->
+    <path d="M110 404 V352 a20 20 0 0 1 40 0 V404 Z"/>
+    <path d="M172 404 V352 a20 20 0 0 1 40 0 V404 Z"/>
+    <path d="M234 404 V352 a20 20 0 0 1 40 0 V404 Z"/>
+    <path d="M296 404 V352 a20 20 0 0 1 40 0 V404 Z"/>
+    <path d="M358 404 V352 a20 20 0 0 1 40 0 V404 Z"/>
+    <!-- Étage du milieu -->
+    <path d="M110 318 V278 a20 20 0 0 1 40 0 V318 Z"/>
+    <path d="M172 318 V278 a20 20 0 0 1 40 0 V318 Z"/>
+    <path d="M234 318 V278 a20 20 0 0 1 40 0 V318 Z"/>
+    <path d="M296 318 V278 a20 20 0 0 1 40 0 V318 Z"/>
+    <path d="M358 318 V278 a20 20 0 0 1 40 0 V318 Z"/>
+    <!-- Étage du haut (seulement sous la partie intacte) -->
+    <path d="M110 244 V204 a20 20 0 0 1 40 0 V244 Z"/>
+    <path d="M172 244 V204 a20 20 0 0 1 40 0 V244 Z"/>
+    <path d="M234 244 V204 a20 20 0 0 1 40 0 V244 Z"/>
+    <path d="M296 244 V204 a20 20 0 0 1 40 0 V244 Z"/>
+    <!-- Corniches entre les étages -->
+    <rect x="92" y="326" width="328" height="8"/>
+    <rect x="92" y="252" width="328" height="8"/>
+    <rect x="92" y="166" width="200" height="8"/>
+  </g>
+  <!-- Sol -->
+  <rect x="72" y="404" width="368" height="14" rx="4" fill="#fbf6ee"/>
+</svg>

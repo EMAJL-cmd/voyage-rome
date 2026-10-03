@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=12";
+import { firebaseConfig } from "./firebase-config.js?v=13";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -30,7 +30,15 @@ const JOURS = ["2026-12-26", "2026-12-27", "2026-12-28", "2026-12-29", "2026-12-
 
 // Le code secret du voyage est la partie de l'adresse après « # ».
 // Il n'est jamais envoyé à GitHub, seulement à la base de données.
-const code = decodeURIComponent(location.hash.slice(1));
+// Il est aussi gardé sur l'appareil : si un raccourci perd la fin de l'adresse,
+// l'application le retrouve quand même.
+let code = decodeURIComponent(location.hash.slice(1));
+if (code.length >= 16) {
+  ecrire("code", code);
+} else if ((lire("code") || "").length >= 16) {
+  code = lire("code");
+  history.replaceState(null, "", "#" + encodeURIComponent(code));
+}
 window.addEventListener("hashchange", () => location.reload());
 
 // Mémoire de l'appareil (qui je suis, dernier onglet ouvert).
@@ -82,7 +90,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=12";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=13";
       $("fiche-guide").showModal();
     });
   }

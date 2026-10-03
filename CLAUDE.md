@@ -33,6 +33,10 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 ## Architecture (validée par Emmanuelle)
 - **La page** : HTML + CSS + JavaScript « pur », sans framework ni étape de compilation.
   Fichiers : `index.html`, `style.css`, `app.js`.
+  Icône : `icone.svg` (dessin source) → `icone-512.png`, `icone-192.png`, `apple-touch-icon.png` (180 px),
+  `favicon-32.png`, générées avec Chrome (capture) puis `sips`. Ouverture plein écran depuis l'écran
+  d'accueil via les balises `apple-mobile-web-app-capable` / `mobile-web-app-capable`. Pas de manifeste
+  volontairement : son `start_url` ferait perdre le code secret après le `#`.
   Mode d'emploi : `guide.html` (ouvert dans l'appli par « ❓ Mode d'emploi ») et sa version PDF
   `Mode-d-emploi-Rome-en-famille.pdf` (à joindre aux messages). Les mettre à jour quand une fonction change.
   Le PDF se refait avec Chrome : `--headless=new --print-to-pdf` sur `guide.html` servi en local.
@@ -47,6 +51,8 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
     règles de sécurité interdisent de lister les voyages existants.
   - Le **code secret ne doit jamais apparaître dans le code source** : le dépôt GitHub est public.
     La configuration Firebase (clé « apiKey » publique) peut, elle, y figurer : c'est normal.
+  - Le code est aussi gardé sur l'appareil (`localStorage`, clé `code`) : si un raccourci d'écran d'accueil
+    perd la fin de l'adresse, l'application le retrouve.
   - À la première visite, la page demande « Qui êtes-vous ? » (choix parmi les 5 prénoms) et
     s'en souvient sur l'appareil (`localStorage`).
 - Le lien secret complet est dans `lien-secret.txt` (ignoré par Git, ne jamais le publier ni l'afficher).
