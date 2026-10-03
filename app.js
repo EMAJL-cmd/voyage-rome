@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/fireba
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=4";
+import { firebaseConfig } from "./firebase-config.js?v=5";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -308,9 +308,12 @@ function carteIdee(idee) {
   statut.type = "button";
   statut.setAttribute("aria-label", "Statut : " + statut.textContent + ". Toucher pour passer au suivant.");
   statut.addEventListener("click", () => changerStatut(idee));
-  bas.append(statut);
-  if (idee.auteur) bas.append(el("span", "discret", "Proposé par " + idee.auteur));
+  const modifier = el("button", "bouton-modifier", "✏️ Modifier");
+  modifier.type = "button";
+  modifier.addEventListener("click", () => ouvrirFiche(idee));
+  bas.append(statut, modifier);
   carte.append(bas);
+  if (idee.auteur) carte.append(el("p", "discret auteur", "Proposé par " + idee.auteur));
 
   return carte;
 }

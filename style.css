@@ -321,6 +321,19 @@ main {
   margin-top: 10px;
 }
 
+.bouton-modifier {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--trait);
+  border-radius: 20px;
+  background: none;
+  font-size: 0.9rem;
+}
+
+.auteur {
+  margin: 6px 0 0;
+}
+
 .statut {
   min-height: 40px;
   padding: 0 14px;
