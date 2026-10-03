@@ -6,9 +6,9 @@ service cloud.firestore {
     // et aucune règle ne permet de lister les voyages existants.
     match /voyages/{code}/{rubrique}/{id} {
       allow read, delete: if code.size() >= 16
-        && rubrique in ['programme', 'ressources', 'infos'];
+        && rubrique in ['programme', 'ressources', 'infos', 'jours'];
       allow create, update: if code.size() >= 16
-        && rubrique in ['programme', 'ressources', 'infos']
+        && rubrique in ['programme', 'ressources', 'infos', 'jours']
         && request.resource.data.size() <= 20;
     }
   }

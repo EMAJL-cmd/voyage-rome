@@ -23,6 +23,8 @@ son ordinateur, **sans avoir à créer de compte**.
    - Deux vues (choix mémorisé sur l'appareil) : **📋 Aperçu** (par défaut : une ligne par activité, jour
      par jour, compteur « 🟠 N réservations encore à faire » qui filtre, lien vers les idées sans date) et
      **🗂️ Détail** (les cartes). Toucher une journée ou une activité de l'aperçu ouvre le détail à cet endroit.
+   - Titres de journées (« Vatican »…) : collection `voyages/{code}/jours`, un document par date
+     (identifiant `2026-12-26`…) avec `titre`. Affichés dans l'aperçu et le détail, modifiables par ✏️ dans le détail.
    - « ⚡ Ajouter plusieurs idées d'un coup » : des noms séparés par des virgules (ou retours à la ligne)
      créent une carte chacun dans « Idées sans date, à placer » ; les noms déjà présents (sans tenir compte
      des majuscules ni des accents) sont ignorés ; on choisit le type et « Proposé par ».
@@ -62,7 +64,7 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - Les règles de sécurité sont dans `firestore.rules`. Elles ne sont PAS publiées automatiquement :
   après chaque modification, Emmanuelle doit les recoller dans la console Firebase
   (Firestore → Règles → Publier). Penser à ajouter toute nouvelle rubrique à la liste autorisée.
-- Organisation des données Firestore : `voyages/{code}/programme`, `…/ressources`, `…/infos`.
+- Organisation des données Firestore : `voyages/{code}/programme`, `…/ressources`, `…/infos`, `…/jours`.
 - La base est vide au départ : la page doit l'afficher proprement, avec des messages du type
   « Aucune visite pour l'instant ».
 

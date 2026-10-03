@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
-  arrayUnion, arrayRemove, writeBatch
+  arrayUnion, arrayRemove, writeBatch, setDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=14";
+import { firebaseConfig } from "./firebase-config.js?v=15";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -90,13 +90,14 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=14";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=15";
       $("fiche-guide").showModal();
     });
   }
   $("fermer-guide").addEventListener("click", () => $("fiche-guide").close());
 
   demarrerProgramme();
+  demarrerTitresJours();
   demarrerRessources();
   demarrerInfos();
   afficher();
@@ -388,12 +389,66 @@ function afficherProgramme() {
 
   for (const [titre, elements, repere] of groupes) {
     if (elements.length === 0) continue;
-    const h3 = el("h3", "titre-jour", titre);
+    const h3 = el("h3", "titre-jour");
     h3.id = "jour-" + repere;
+    h3.append(el("span", "", titre));
+    if (JOURS.includes(repere)) {
+      if (titresJours[repere]) h3.append(el("span", "theme-jour", titresJours[repere]));
+      const modifier = el("button", "modifier-titre", titresJours[repere] ? "✏️" : "✏️ Donner un titre");
+      modifier.type = "button";
+      modifier.setAttribute("aria-label", "Titre de la journée");
+      modifier.addEventListener("click", () => ouvrirFicheJour(repere));
+      h3.append(modifier);
+    }
     liste.append(h3);
     for (const idee of elements.sort(ordre)) liste.append(carteIdee(idee));
   }
   afficherApercu(ordre);
+}
+
+/* ---------- Programme : titres des journées ---------- */
+
+// Un document par journée (identifiant = la date), avec son titre : « Vatican »…
+let titresJours = {};
+let jourOuvert = null;
+
+function demarrerTitresJours() {
+  onSnapshot(
+    collection(db, "voyages", code, "jours"),
+    (resultat) => {
+      titresJours = {};
+      for (const d of resultat.docs) {
+        if (JOURS.includes(d.id) && d.data().titre) titresJours[d.id] = d.data().titre;
+      }
+      afficherProgramme();
+    },
+    // Règles pas encore à jour : le programme s'affiche simplement sans titres.
+    (erreur) => console.warn("Titres des journées indisponibles", erreur)
+  );
+
+  const fiche = $("fiche-jour");
+  const formulaire = $("formulaire-jour");
+  $("annuler-jour").addEventListener("click", () => fiche.close());
+  formulaire.addEventListener("submit", async (evenement) => {
+    evenement.preventDefault();
+    const titre = formulaire.elements.titre.value.trim().slice(0, 60);
+    const jour = jourOuvert;
+    fiche.close();
+    try {
+      const reference = doc(db, "voyages", code, "jours", jour);
+      if (titre) await setDoc(reference, { titre, modifiePar: moi(), modifieLe: serverTimestamp() });
+      else await deleteDoc(reference);
+    } catch (erreur) {
+      signalerErreur($("etat-programme"), erreur);
+    }
+  });
+}
+
+function ouvrirFicheJour(jour) {
+  jourOuvert = jour;
+  $("date-fiche-jour").textContent = jourLisible(jour);
+  $("formulaire-jour").elements.titre.value = titresJours[jour] || "";
+  $("fiche-jour").showModal();
 }
 
 /* ---------- Programme : aperçu du séjour ---------- */
@@ -460,7 +515,9 @@ function afficherApercu(ordre) {
     const bloc = el("section", "jour-apercu");
     const titre = el("button", "titre-apercu");
     titre.type = "button";
-    titre.append(el("span", "", jourLisible(jour)), el("span", "fleche", "›"));
+    const date = el("span", "date-apercu", jourLisible(jour));
+    if (titresJours[jour]) date.append(el("span", "theme-jour", titresJours[jour]));
+    titre.append(date, el("span", "fleche", "›"));
     titre.addEventListener("click", () => allerAuDetail("jour-" + jour));
     bloc.append(titre);
 

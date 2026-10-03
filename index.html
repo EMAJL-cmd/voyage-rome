@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="stylesheet" href="style.css?v=14">
-  <script type="module" src="app.js?v=14"></script>
+  <link rel="stylesheet" href="style.css?v=15">
+  <script type="module" src="app.js?v=15"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -99,6 +99,22 @@
       <span class="place-bouton"></span>
     </div>
     <iframe id="cadre-guide" title="Mode d'emploi"></iframe>
+  </dialog>
+
+  <!-- Titre d'une journée du programme -->
+  <dialog id="fiche-jour" class="fiche">
+    <form id="formulaire-jour" method="dialog">
+      <div class="fiche-entete">
+        <button id="annuler-jour" class="bouton-secondaire" type="button">Annuler</button>
+        <h2 tabindex="-1" autofocus>Titre du jour</h2>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
+      <p id="date-fiche-jour" class="details"></p>
+      <label>Titre de la journée
+        <input name="titre" type="text" maxlength="60" placeholder="Ex. : Vatican">
+      </label>
+      <p class="aide-fiche">Laissez vide pour retirer le titre.</p>
+    </form>
   </dialog>
 
   <!-- Ajout rapide : plusieurs idées d'un coup, séparées par des virgules -->

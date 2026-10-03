@@ -453,6 +453,43 @@ main {
   .compteur:disabled { background: #1f3d25; color: #a4dcae; }
 }
 
+/* --- Titres des journées --- */
+
+.titre-jour {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
+.theme-jour {
+  display: block;
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.titre-jour .theme-jour {
+  flex-basis: 100%;
+  order: 2;
+}
+
+.modifier-titre {
+  min-height: 36px;
+  margin-left: auto;
+  padding: 0 6px;
+  border: none;
+  background: none;
+  color: var(--discret);
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+.date-apercu {
+  display: block;
+}
+
 .jour-apercu {
   margin-top: 18px;
 }
