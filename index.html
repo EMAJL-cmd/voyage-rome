@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="app.js"></script>
+  <link rel="stylesheet" href="style.css?v=3">
+  <script type="module" src="app.js?v=3"></script>
 </head>
 <body>
+  <!-- Visible tant que le script n'a pas démarré -->
+  <section id="chargement" class="ecran-plein">
+    <h1>Rome en famille 🏛️</h1>
+    <p>Chargement…</p>
+    <p class="aide">Si rien ne s'affiche, rechargez la page dans une minute.</p>
+  </section>
+
   <!-- Message si le lien ne contient pas le code secret -->
   <section id="lien-incomplet" class="ecran-plein" hidden>
     <h1>Rome en famille 🏛️</h1>

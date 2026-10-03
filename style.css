@@ -68,6 +68,11 @@ button {
   font-size: 1.2rem;
 }
 
+.ecran-plein .aide {
+  color: var(--discret);
+  font-size: 0.95rem;
+}
+
 .boutons-voyageurs {
   display: grid;
   gap: 12px;

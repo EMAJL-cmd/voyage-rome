@@ -60,6 +60,9 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - **Sécurité** : toute personne qui a le lien peut lire et modifier les données. Ne jamais y stocker
   de numéros de passeport, de carte bancaire ni de mots de passe. Les numéros de réservation sont
   acceptables.
+- **À chaque publication**, augmenter le numéro de version `?v=N` dans `index.html` (style.css, app.js)
+  et dans l'import de `firebase-config.js` (app.js). Sinon, les téléphones gardent jusqu'à 10 minutes
+  d'anciens fichiers en mémoire, mélangés aux nouveaux, et la page peut rester blanche.
 - Faire un commit Git à la fin de chaque étape validée, avec un message clair en français.
 
 ## Avancement
