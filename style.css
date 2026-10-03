@@ -1,0 +1,41 @@
+:root {
+  --fond: #fbf6ee;
+  --texte: #2b2118;
+  --accent: #b5462b;
+  --discret: #7a6a5c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #1d1814;
+    --texte: #f2e9dd;
+    --accent: #e0805f;
+    --discret: #b3a392;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+h1 {
+  color: var(--accent);
+  font-size: 2rem;
+}
+
+.petit {
+  color: var(--discret);
+  font-size: 0.9rem;
+}
