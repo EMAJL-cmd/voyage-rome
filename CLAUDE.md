@@ -23,11 +23,12 @@ son ordinateur, **sans avoir à créer de compte**.
 
 Les valises et les dépenses ont été écartées volontairement. Ne pas les ajouter sans demande.
 
-## Architecture (proposée, à valider par Emmanuelle)
+## Architecture (validée par Emmanuelle)
 - **La page** : HTML + CSS + JavaScript « pur », sans framework ni étape de compilation.
   Fichiers : `index.html`, `style.css`, `app.js`.
 - **Le code** est versionné avec **Git** et stocké sur **GitHub**.
 - **L'hébergement** se fait sur **GitHub Pages** (gratuit) : chaque envoi sur GitHub met le site à jour.
+  Dépôt : `EMAJL-cmd/voyage-rome`. Site : https://emajl-cmd.github.io/voyage-rome/
 - **Les données partagées** sont dans **Firebase Firestore** (Google, offre gratuite « Spark »,
   sans carte bancaire). Mise à jour en direct : les autres voient les changements sans recharger.
 - **Pas de comptes** pour la famille :
@@ -58,8 +59,8 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - Faire un commit Git à la fin de chaque étape validée, avec un message clair en français.
 
 ## Avancement
-- [ ] Étape 0 — Préparatifs : dossier du projet, compte GitHub, projet Firebase
-- [ ] Étape 1 — Page « Bonjour Rome » publiée sur GitHub Pages et ouverte sur téléphone
+- [ ] Étape 0 — Préparatifs : dossier du projet ✅, compte GitHub ✅, projet Firebase (à faire)
+- [x] Étape 1 — Page « Bonjour Rome » publiée sur GitHub Pages et ouverte sur téléphone
 - [ ] Étape 2 — Branchement de Firebase et test de partage avec un membre de la famille
 - [ ] Étape 3 — Squelette : 3 onglets, choix « Qui êtes-vous ? »
 - [ ] Étape 4 — Programme
