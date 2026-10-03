@@ -1,113 +1,226 @@
 :root {
   --fond: #fbf6ee;
+  --carte: #ffffff;
   --texte: #2b2118;
   --accent: #b5462b;
+  --accent-doux: #f4e1d6;
   --discret: #7a6a5c;
+  --trait: #e6dacb;
+  --barre: 72px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --fond: #1d1814;
+    --carte: #2a231d;
     --texte: #f2e9dd;
     --accent: #e0805f;
+    --accent-doux: #43281e;
     --discret: #b3a392;
+    --trait: #3d332b;
   }
 }
 
-body {
-  margin: 0;
-  background: var(--fond);
-  color: var(--texte);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-main {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 48px 16px;
-  text-align: center;
-}
-
-h1 {
-  color: var(--accent);
-  font-size: 2rem;
-}
-
-.petit {
-  color: var(--discret);
-  font-size: 0.9rem;
-}
-
-.test {
-  margin-top: 40px;
-  text-align: left;
-}
-
-h2 {
-  font-size: 1.3rem;
-}
-
-.etat.ok {
-  color: #2f7a3d;
-}
-
-.etat.erreur {
-  color: var(--accent);
-  font-weight: bold;
-}
-
-form {
-  display: flex;
-  gap: 8px;
+* {
+  box-sizing: border-box;
 }
 
 [hidden] {
   display: none !important;
 }
 
-input,
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+.titre {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--accent);
+}
+
 button {
   font: inherit;
-  min-height: 48px;
-  border-radius: 10px;
-}
-
-input {
-  flex: 1;
-  min-width: 0;
-  padding: 0 12px;
-  border: 1px solid var(--discret);
-  background: transparent;
-  color: var(--texte);
-}
-
-button {
-  padding: 0 18px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
+  color: inherit;
   cursor: pointer;
 }
 
-#liste {
-  list-style: none;
+/* --- Écrans plein écran : lien incomplet, « Qui êtes-vous ? » --- */
+
+.ecran-plein {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.ecran-plein h1 {
+  font-size: 2rem;
+}
+
+.ecran-plein p {
+  font-size: 1.2rem;
+}
+
+.boutons-voyageurs {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.boutons-voyageurs button {
+  min-height: 60px;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--carte);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.boutons-voyageurs button:active {
+  background: var(--accent-doux);
+}
+
+/* --- En-tête --- */
+
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--trait);
+}
+
+.entete p {
+  margin: 0;
+}
+
+.titre {
+  font-size: 1.25rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.dates {
+  color: var(--discret);
+  font-size: 0.9rem;
+}
+
+.moi {
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+.lien {
+  min-height: 32px;
   padding: 0;
+  border: none;
+  background: none;
+  color: var(--discret);
+  font-size: 0.85rem;
+  text-decoration: underline;
 }
 
-#liste li {
-  padding: 12px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--discret) 30%, transparent);
+/* --- Onglets : barre en bas sur téléphone --- */
+
+.onglets {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: var(--carte);
+  border-top: 1px solid var(--trait);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 10;
 }
 
-#liste .vide {
+.onglets button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--barre);
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  color: var(--discret);
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.onglets button span {
+  font-size: 1.5rem;
+}
+
+.onglets button[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px calc(var(--barre) + 32px);
+}
+
+.rubrique h2 {
+  margin-top: 8px;
+}
+
+.vide {
   color: var(--discret);
   font-style: italic;
 }
 
-.quand {
-  display: block;
-  color: var(--discret);
-  font-size: 0.8rem;
+/* --- Ordinateur : onglets en haut --- */
+
+@media (min-width: 768px) {
+  .entete {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 12px;
+    border-bottom: none;
+  }
+
+  .onglets {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    justify-content: center;
+    border-top: none;
+    border-bottom: 1px solid var(--trait);
+    padding-bottom: 0;
+  }
+
+  .onglets button {
+    flex: 0 1 200px;
+    flex-direction: row;
+    gap: 8px;
+    min-height: 56px;
+    font-size: 1rem;
+  }
+
+  .onglets button span {
+    font-size: 1.2rem;
+  }
+
+  .onglets button[aria-current="page"] {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  main {
+    padding-bottom: 48px;
+  }
 }

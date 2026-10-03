@@ -2,26 +2,58 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
   <link rel="stylesheet" href="style.css">
   <script type="module" src="app.js"></script>
 </head>
 <body>
-  <main>
-    <h1>Bonjour Rome ! 🏛️</h1>
-    <p>Voyage en famille du 26 au 30 décembre.</p>
-    <p class="petit">Solange · Emmanuelle · Jean-Laurent · Héloïse · Thomas</p>
+  <!-- Message si le lien ne contient pas le code secret -->
+  <section id="lien-incomplet" class="ecran-plein" hidden>
+    <h1>Rome en famille 🏛️</h1>
+    <p>Ce lien est incomplet.<br>Demandez le lien complet à Emmanuelle.</p>
+  </section>
 
-    <section class="test">
-      <h2>Test de partage</h2>
-      <p id="etat" class="etat">Connexion en cours…</p>
-      <form id="formulaire" hidden>
-        <input id="champ" type="text" maxlength="200" placeholder="Écrivez un petit mot…" autocomplete="off">
-        <button type="submit">Envoyer</button>
-      </form>
-      <ul id="liste"></ul>
-    </section>
-  </main>
+  <!-- « Qui êtes-vous ? » à la première visite -->
+  <section id="choix-voyageur" class="ecran-plein" hidden>
+    <h1>Rome en famille 🏛️</h1>
+    <p>Qui êtes-vous ?</p>
+    <div id="boutons-voyageurs" class="boutons-voyageurs"></div>
+  </section>
+
+  <div id="application" hidden>
+    <header class="entete">
+      <div>
+        <p class="titre">Rome en famille 🏛️</p>
+        <p class="dates">26 – 30 déc.</p>
+      </div>
+      <p class="moi">
+        Bonjour <strong id="prenom"></strong><br>
+        <button id="changer" class="lien" type="button">Ce n'est pas moi</button>
+      </p>
+    </header>
+
+    <nav class="onglets" aria-label="Rubriques">
+      <button type="button" data-onglet="programme"><span aria-hidden="true">🏛️</span>Programme</button>
+      <button type="button" data-onglet="ressources"><span aria-hidden="true">📚</span>À lire / à voir</button>
+      <button type="button" data-onglet="infos"><span aria-hidden="true">🧳</span>Infos pratiques</button>
+    </nav>
+
+    <main>
+      <section id="programme" class="rubrique">
+        <h2>Programme</h2>
+        <p class="vide">Bientôt ici : les visites, restaurants et activités du voyage.</p>
+      </section>
+      <section id="ressources" class="rubrique">
+        <h2>À lire / à voir</h2>
+        <p class="vide">Bientôt ici : les articles, vidéos et livres à découvrir avant de partir.</p>
+      </section>
+      <section id="infos" class="rubrique">
+        <h2>Infos pratiques</h2>
+        <p class="vide">Bientôt ici : les trains, vols et hôtels.</p>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
