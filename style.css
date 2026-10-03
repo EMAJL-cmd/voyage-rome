@@ -323,7 +323,8 @@ main {
 }
 
 .lien-externe {
-  display: inline-block;
+  display: block;
+  width: fit-content;
   margin-top: 6px;
   padding: 6px 0;
   color: var(--accent);

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=6">
-  <script type="module" src="app.js?v=6"></script>
+  <link rel="stylesheet" href="style.css?v=7">
+  <script type="module" src="app.js?v=7"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -61,8 +61,12 @@
         <p class="vide">Bientôt ici : les articles, vidéos et livres à découvrir avant de partir.</p>
       </section>
       <section id="infos" class="rubrique">
-        <h2>Infos pratiques</h2>
-        <p class="vide">Bientôt ici : les trains, vols et hôtels.</p>
+        <div class="titre-rubrique">
+          <h2>Infos pratiques</h2>
+          <button id="ajouter-infos" class="bouton-principal" type="button">+ Ajouter</button>
+        </div>
+        <p id="etat-infos" class="etat" hidden></p>
+        <div id="liste-infos"><p class="vide">Chargement des infos…</p></div>
       </section>
     </main>
   </div>
@@ -132,6 +136,61 @@
         <button id="supprimer-programme" class="bouton-danger" type="button">Supprimer définitivement</button>
         <span class="espace"></span>
         <button id="annuler-programme" class="bouton-secondaire" type="button">Annuler</button>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Formulaire d'ajout / de modification d'une info pratique -->
+  <dialog id="fiche-infos" class="fiche">
+    <form id="formulaire-infos" method="dialog">
+      <h2 id="titre-fiche-infos">Nouvelle info</h2>
+
+      <fieldset class="choix-type">
+        <legend>Catégorie</legend>
+        <label><input type="radio" name="categorie" value="transport" checked><span>✈️ Transport</span></label>
+        <label><input type="radio" name="categorie" value="hebergement"><span>🏨 Hébergement</span></label>
+        <label><input type="radio" name="categorie" value="autre"><span>📌 Autre</span></label>
+      </fieldset>
+
+      <label>Titre
+        <input name="titre" type="text" maxlength="120" required placeholder="Ex. : Vol aller AF1104">
+      </label>
+
+      <div class="deux-colonnes">
+        <label>Jour
+          <select name="jour">
+            <option value="">—</option>
+            <option value="2026-12-26">Sam. 26 déc.</option>
+            <option value="2026-12-27">Dim. 27 déc.</option>
+            <option value="2026-12-28">Lun. 28 déc.</option>
+            <option value="2026-12-29">Mar. 29 déc.</option>
+            <option value="2026-12-30">Mer. 30 déc.</option>
+          </select>
+        </label>
+        <label>Heure
+          <input name="heure" type="time">
+        </label>
+      </div>
+
+      <label>Détails
+        <textarea name="details" rows="5" maxlength="2000" placeholder="Horaires, terminal, numéro de réservation, code d'accès…"></textarea>
+      </label>
+
+      <label>Adresse (facultatif)
+        <input name="adresse" type="text" maxlength="200" placeholder="Ex. : Via dei Serpenti 10, Roma">
+      </label>
+
+      <label>Lien (facultatif)
+        <input name="lien" type="url" maxlength="500" placeholder="https://…">
+      </label>
+
+      <p class="aide-fiche">⚠️ Tout le monde voit ces infos : jamais de passeport, de carte bancaire ni de mot de passe.</p>
+
+      <div class="actions">
+        <button id="supprimer-infos" class="bouton-danger" type="button">Supprimer</button>
+        <span class="espace"></span>
+        <button id="annuler-infos" class="bouton-secondaire" type="button">Annuler</button>
         <button class="bouton-principal" type="submit">Enregistrer</button>
       </div>
     </form>

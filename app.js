@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/fireba
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=6";
+import { firebaseConfig } from "./firebase-config.js?v=7";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -79,6 +79,7 @@ function demarrer() {
   }
 
   demarrerProgramme();
+  demarrerInfos();
   afficher();
 }
 
@@ -337,6 +338,157 @@ function carteIdee(idee) {
   bas.append(statut, modifier);
   carte.append(bas);
   if (idee.auteur) carte.append(el("p", "discret auteur", "Proposé par " + idee.auteur));
+
+  return carte;
+}
+
+/* ---------- Infos pratiques ---------- */
+
+const CATEGORIES = {
+  transport: "✈️ Transports",
+  hebergement: "🏨 Hébergement",
+  autre: "📌 Autres infos",
+};
+
+let infos = [];
+let infoOuverte = null; // null = nouvelle info
+
+function demarrerInfos() {
+  const collectionInfos = collection(db, "voyages", code, "infos");
+
+  onSnapshot(
+    collectionInfos,
+    (resultat) => {
+      $("etat-infos").hidden = true;
+      infos = resultat.docs.map((d) => ({ id: d.id, ...d.data() }));
+      afficherInfos();
+    },
+    (erreur) => signalerErreur($("etat-infos"), erreur)
+  );
+
+  const fiche = $("fiche-infos");
+  const formulaire = $("formulaire-infos");
+
+  $("ajouter-infos").addEventListener("click", () => ouvrirFicheInfos(null));
+  $("annuler-infos").addEventListener("click", () => fiche.close());
+
+  $("supprimer-infos").addEventListener("click", async () => {
+    if (!infoOuverte) return;
+    if (!confirm(`Supprimer « ${infoOuverte.titre} » pour toute la famille ?`)) return;
+    fiche.close();
+    try {
+      await deleteDoc(doc(collectionInfos, infoOuverte.id));
+    } catch (erreur) {
+      signalerErreur($("etat-infos"), erreur);
+    }
+  });
+
+  formulaire.addEventListener("submit", async (evenement) => {
+    evenement.preventDefault();
+    const f = formulaire.elements;
+    const donnees = {
+      categorie: f.categorie.value,
+      titre: f.titre.value.trim(),
+      jour: f.jour.value,
+      heure: f.heure.value,
+      details: f.details.value.trim(),
+      adresse: f.adresse.value.trim(),
+      lien: f.lien.value.trim(),
+      modifiePar: moi(),
+      modifieLe: serverTimestamp(),
+    };
+    if (!donnees.titre) return;
+    fiche.close();
+    try {
+      if (infoOuverte) {
+        await updateDoc(doc(collectionInfos, infoOuverte.id), donnees);
+      } else {
+        await addDoc(collectionInfos, { ...donnees, auteur: moi(), creeLe: serverTimestamp() });
+      }
+    } catch (erreur) {
+      signalerErreur($("etat-infos"), erreur);
+    }
+  });
+}
+
+function ouvrirFicheInfos(info) {
+  infoOuverte = info;
+  const f = $("formulaire-infos").elements;
+  const i = info || {};
+  $("titre-fiche-infos").textContent = info ? "Modifier" : "Nouvelle info";
+  f.categorie.value = CATEGORIES[i.categorie] ? i.categorie : "transport";
+  f.titre.value = i.titre || "";
+  f.jour.value = JOURS.includes(i.jour) ? i.jour : "";
+  f.heure.value = i.heure || "";
+  f.details.value = i.details || "";
+  f.adresse.value = i.adresse || "";
+  f.lien.value = i.lien || "";
+  $("supprimer-infos").hidden = !info;
+  $("fiche-infos").showModal();
+}
+
+function afficherInfos() {
+  const liste = $("liste-infos");
+  liste.replaceChildren();
+
+  if (infos.length === 0) {
+    liste.append(el("p", "vide", "Aucune info pour l'instant. Touchez « + Ajouter » pour la première."));
+    return;
+  }
+
+  // Dans chaque catégorie : dans l'ordre du voyage.
+  const ordre = (a, b) =>
+    (a.jour || "9").localeCompare(b.jour || "9") ||
+    (a.heure || "99").localeCompare(b.heure || "99") ||
+    (a.titre || "").localeCompare(b.titre || "", "fr");
+
+  for (const [categorie, titre] of Object.entries(CATEGORIES)) {
+    const elements = infos.filter((i) => (CATEGORIES[i.categorie] ? i.categorie : "autre") === categorie);
+    if (elements.length === 0) continue;
+    liste.append(el("h3", "titre-jour", titre));
+    for (const info of elements.sort(ordre)) liste.append(carteInfo(info));
+  }
+}
+
+function carteInfo(info) {
+  const carte = el("article", "carte");
+
+  const haut = el("div", "carte-haut");
+  const ouvrir = el("button", "carte-titre");
+  ouvrir.type = "button";
+  ouvrir.append(el("span", "", info.titre || "(sans titre)"));
+  ouvrir.addEventListener("click", () => ouvrirFicheInfos(info));
+  haut.append(ouvrir);
+  carte.append(haut);
+
+  const quand = [JOURS.includes(info.jour) ? jourLisible(info.jour) : "", info.heure ? info.heure.replace(":", "h") : ""]
+    .filter(Boolean).join(" · ");
+  if (quand) carte.append(el("p", "details", quand));
+  if (info.details) carte.append(el("p", "note", info.details));
+
+  if (info.adresse) {
+    const a = el("a", "lien-externe", "📍 " + info.adresse);
+    a.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(info.adresse);
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    carte.append(a);
+  }
+
+  const lien = lienSur(info.lien);
+  if (lien) {
+    const a = el("a", "lien-externe", "Ouvrir le lien ↗");
+    a.href = lien;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    carte.append(a);
+  }
+
+  const bas = el("div", "carte-bas");
+  const modifier = el("button", "bouton-modifier", "✏️ Modifier");
+  modifier.type = "button";
+  modifier.addEventListener("click", () => ouvrirFicheInfos(info));
+  bas.append(modifier);
+  carte.append(bas);
 
   return carte;
 }
