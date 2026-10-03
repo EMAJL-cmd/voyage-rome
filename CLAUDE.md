@@ -86,6 +86,11 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - **À chaque publication**, augmenter le numéro de version `?v=N` dans `index.html` (style.css, app.js)
   et dans l'import de `firebase-config.js` (app.js). Sinon, les téléphones gardent jusqu'à 10 minutes
   d'anciens fichiers en mémoire, mélangés aux nouveaux, et la page peut rester blanche.
+- Mise à jour automatique : à chaque retour sur l'application (et 5 s après l'ouverture), `app.js` compare
+  sa version (`?v=N` de sa propre adresse) à celle d'`index.html` en ligne et recharge si elle a changé
+  (une seule tentative par version). Le numéro « Version N » s'affiche en bas de la page.
+- Les écoutes Firestore en erreur ne se relancent pas seules : prévoir une nouvelle tentative (voir
+  `ecouterTitresJours`), surtout pour une rubrique qui dépend de règles à publier par Emmanuelle.
 - Faire un commit Git à la fin de chaque étape validée, avec un message clair en français.
 
 ## Avancement

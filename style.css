@@ -817,3 +817,10 @@ main {
     height: 100%;
   }
 }
+
+.version {
+  margin-top: 40px;
+  text-align: center;
+  color: var(--discret);
+  font-size: 0.75rem;
+}

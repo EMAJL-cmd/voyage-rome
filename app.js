@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch, setDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=15";
+import { firebaseConfig } from "./firebase-config.js?v=16";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -54,6 +54,28 @@ function ecrire(cle, valeur) {
 }
 
 const $ = (id) => document.getElementById(id);
+
+// Numéro de la version en cours (celui de « app.js?v=N » dans index.html).
+const VERSION = new URL(import.meta.url).searchParams.get("v") || "?";
+
+// Une application ajoutée à l'écran d'accueil peut rester ouverte des jours en arrière-plan.
+// À chaque retour sur l'application, on vérifie si une version plus récente est en ligne,
+// et si oui on recharge (une seule tentative par version, pour ne jamais boucler).
+async function verifierMiseAJour() {
+  try {
+    const page = await fetch("./?verif=" + Date.now(), { cache: "no-store" }).then((r) => r.text());
+    const enLigne = (page.match(/app\.js\?v=(\d+)/) || [])[1];
+    if (!enLigne || enLigne === VERSION) return;
+    if (document.querySelector("dialog[open]")) return; // ne pas interrompre une saisie
+    if (sessionStorage.getItem("rechargePour") === enLigne) return;
+    sessionStorage.setItem("rechargePour", enLigne);
+    location.reload();
+  } catch {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") verifierMiseAJour();
+});
+setTimeout(verifierMiseAJour, 5000);
 $("chargement").hidden = true;
 
 let db;
@@ -90,7 +112,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=15";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=16";
       $("fiche-guide").showModal();
     });
   }
@@ -98,6 +120,7 @@ function demarrer() {
 
   demarrerProgramme();
   demarrerTitresJours();
+  $("version").textContent = "Version " + VERSION;
   demarrerRessources();
   demarrerInfos();
   afficher();
@@ -412,7 +435,7 @@ function afficherProgramme() {
 let titresJours = {};
 let jourOuvert = null;
 
-function demarrerTitresJours() {
+function ecouterTitresJours() {
   onSnapshot(
     collection(db, "voyages", code, "jours"),
     (resultat) => {
@@ -422,9 +445,17 @@ function demarrerTitresJours() {
       }
       afficherProgramme();
     },
-    // Règles pas encore à jour : le programme s'affiche simplement sans titres.
-    (erreur) => console.warn("Titres des journées indisponibles", erreur)
+    // En cas de refus (règles pas encore à jour) ou de coupure, on réessaie un peu plus tard :
+    // une écoute en erreur ne se relance jamais toute seule.
+    (erreur) => {
+      console.warn("Titres des journées indisponibles", erreur);
+      setTimeout(ecouterTitresJours, 20000);
+    }
   );
+}
+
+function demarrerTitresJours() {
+  ecouterTitresJours();
 
   const fiche = $("fiche-jour");
   const formulaire = $("formulaire-jour");
