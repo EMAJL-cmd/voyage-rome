@@ -464,7 +464,7 @@ main {
 
 .theme-jour {
   display: block;
-  color: var(--accent);
+  color: var(--texte);
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: normal;
