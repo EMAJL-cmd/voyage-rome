@@ -20,6 +20,9 @@ son ordinateur, **sans avoir à créer de compte**.
    - « Retirer du programme » ne supprime pas : l'idée passe dans « Idées sans date, à placer » (en bas), avec toutes
      ses informations, et son ancien jour est gardé (`jourAvant`) : il est pré-rempli quand on la remet au programme. La suppression définitive
      n'est proposée que pour une idée déjà « Idées sans date, à placer ».
+   - Deux vues (choix mémorisé sur l'appareil) : **📋 Aperçu** (par défaut : une ligne par activité, jour
+     par jour, compteur « 🟠 N réservations encore à faire » qui filtre, lien vers les idées sans date) et
+     **🗂️ Détail** (les cartes). Toucher une journée ou une activité de l'aperçu ouvre le détail à cet endroit.
    - « ⚡ Ajouter plusieurs idées d'un coup » : des noms séparés par des virgules (ou retours à la ligne)
      créent une carte chacun dans « Idées sans date, à placer » ; les noms déjà présents (sans tenir compte
      des majuscules ni des accents) sont ignorés ; on choisit le type et « Proposé par ».

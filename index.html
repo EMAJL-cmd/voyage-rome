@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="stylesheet" href="style.css?v=13">
-  <script type="module" src="app.js?v=13"></script>
+  <link rel="stylesheet" href="style.css?v=14">
+  <script type="module" src="app.js?v=14"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -65,6 +65,11 @@
         <button id="ajout-rapide-programme" class="lien-ressources" type="button">⚡ Ajouter plusieurs idées d'un coup</button>
         <p id="message-programme" class="etat ok" hidden></p>
         <p id="etat-programme" class="etat" hidden></p>
+        <div class="vues" role="group" aria-label="Affichage du programme">
+          <button type="button" data-vue="apercu">📋 Aperçu</button>
+          <button type="button" data-vue="detail">🗂️ Détail</button>
+        </div>
+        <div id="apercu-programme"></div>
         <div id="liste-programme"><p class="vide">Chargement du programme…</p></div>
       </section>
       <section id="ressources" class="rubrique">

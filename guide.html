@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rome en famille · Mode d'emploi</title>
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
   <style>
     /* Mise en page propre au mode d'emploi (les cartes et boutons reprennent le style de l'application) */
     .guide {
@@ -256,7 +256,16 @@
 
     <section class="etape">
       <h2><span class="numero">4</span> Le programme</h2>
-      <p>Chaque idée est une carte :</p>
+      <p>En haut, deux façons de le voir :</p>
+      <div class="maquette">
+        <div class="vues"><button type="button" aria-pressed="true">📋 Aperçu</button><button type="button">🗂️ Détail</button></div>
+      </div>
+      <ul class="legende">
+        <li><span class="repere">📋</span><span><strong>Aperçu</strong> : tout le séjour en une liste, jour par jour. Touchez une journée ou une activité pour voir le détail.</span></li>
+        <li><span class="repere">🟠</span><span>Le compteur « réservations encore à faire » : touchez-le pour ne voir qu'elles.</span></li>
+        <li><span class="repere">🗂️</span><span><strong>Détail</strong> : les cartes complètes.</span></li>
+      </ul>
+      <p>Dans le détail, chaque idée est une carte :</p>
       <div class="maquette">
         <article class="carte">
           <div class="carte-haut">

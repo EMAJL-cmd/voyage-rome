@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove, writeBatch
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=13";
+import { firebaseConfig } from "./firebase-config.js?v=14";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -90,7 +90,7 @@ function demarrer() {
   // Mode d'emploi : chargé seulement à la première ouverture.
   for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
     bouton.addEventListener("click", () => {
-      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=13";
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=14";
       $("fiche-guide").showModal();
     });
   }
@@ -184,6 +184,13 @@ function demarrerProgramme() {
 
   $("ajouter-programme").addEventListener("click", () => ouvrirFiche(null));
   demarrerAjoutRapide(programme);
+  for (const bouton of document.querySelectorAll("[data-vue]")) {
+    bouton.addEventListener("click", () => {
+      choisirVue(bouton.dataset.vue);
+      window.scrollTo(0, 0);
+    });
+  }
+  choisirVue(vueProgramme());
   $("annuler-programme").addEventListener("click", () => fiche.close());
 
   // « Retirer » ne supprime rien : l'idée va dans « Idées sans date, à placer », en bas du programme,
@@ -375,14 +382,113 @@ function afficherProgramme() {
     (a.nom || "").localeCompare(b.nom || "", "fr");
 
   const groupes = [
-    ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour)]),
-    ["Idées sans date, à placer", idees.filter((i) => !JOURS.includes(i.jour))],
+    ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour), jour]),
+    ["Idées sans date, à placer", idees.filter((i) => !JOURS.includes(i.jour)), "sans-date"],
   ];
 
-  for (const [titre, elements] of groupes) {
+  for (const [titre, elements, repere] of groupes) {
     if (elements.length === 0) continue;
-    liste.append(el("h3", "titre-jour", titre));
+    const h3 = el("h3", "titre-jour", titre);
+    h3.id = "jour-" + repere;
+    liste.append(h3);
     for (const idee of elements.sort(ordre)) liste.append(carteIdee(idee));
+  }
+  afficherApercu(ordre);
+}
+
+/* ---------- Programme : aperçu du séjour ---------- */
+
+let filtreAReserver = false;
+
+function vueProgramme() {
+  return lire("vueProgramme") === "detail" ? "detail" : "apercu";
+}
+
+function choisirVue(vue) {
+  ecrire("vueProgramme", vue);
+  $("apercu-programme").hidden = vue !== "apercu";
+  $("liste-programme").hidden = vue !== "detail";
+  for (const bouton of document.querySelectorAll("[data-vue]")) {
+    bouton.setAttribute("aria-pressed", String(bouton.dataset.vue === vue));
+  }
+}
+
+// Bascule sur le détail et descend jusqu'à une journée ou une carte.
+function allerAuDetail(idElement) {
+  choisirVue("detail");
+  const cible = $(idElement);
+  if (!cible) return;
+  cible.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (cible.classList.contains("carte")) {
+    cible.classList.remove("surlignee");
+    void cible.offsetWidth; // relance l'animation
+    cible.classList.add("surlignee");
+  }
+}
+
+function afficherApercu(ordre) {
+  const apercu = $("apercu-programme");
+  apercu.replaceChildren();
+  if (idees.length === 0) return;
+
+  const planifiees = idees.filter((i) => JOURS.includes(i.jour));
+  const aReserver = planifiees.filter((i) => i.statut === "a_reserver");
+
+  // Compteur des réservations : un toucher n'affiche qu'elles.
+  const compteur = el("button", "compteur" + (filtreAReserver ? " actif" : ""));
+  compteur.type = "button";
+  if (filtreAReserver) {
+    compteur.textContent = "✕ Revenir à tout le séjour";
+  } else if (aReserver.length) {
+    compteur.textContent = `🟠 ${aReserver.length} ${aReserver.length > 1 ? "réservations encore à faire" : "réservation encore à faire"} ›`;
+  } else {
+    compteur.textContent = "✅ Toutes les réservations sont faites";
+    compteur.disabled = true;
+  }
+  compteur.addEventListener("click", () => {
+    filtreAReserver = !filtreAReserver;
+    afficherApercu(ordre);
+  });
+  apercu.append(compteur);
+
+  for (const jour of JOURS) {
+    const duJour = planifiees
+      .filter((i) => i.jour === jour && (!filtreAReserver || i.statut === "a_reserver"))
+      .sort(ordre);
+    if (duJour.length === 0) continue;
+
+    const bloc = el("section", "jour-apercu");
+    const titre = el("button", "titre-apercu");
+    titre.type = "button";
+    titre.append(el("span", "", jourLisible(jour)), el("span", "fleche", "›"));
+    titre.addEventListener("click", () => allerAuDetail("jour-" + jour));
+    bloc.append(titre);
+
+    const liste = el("ul", "liste-apercu");
+    for (const idee of duJour) {
+      const ligne = el("button", "ligne-apercu" + (idee.statut === "fait" ? " faite" : ""));
+      ligne.type = "button";
+      ligne.append(
+        el("span", "heure-apercu", idee.heure ? idee.heure.replace(":", "h") : ""),
+        el("span", "nom-apercu", idee.nom || "(sans nom)"),
+        el("span", "reperes-apercu", (idee.etoile ? "⭐" : "") + (idee.statut === "a_reserver" ? "🟠" : idee.statut === "fait" ? "🟢" : ""))
+      );
+      ligne.addEventListener("click", () => allerAuDetail("idee-" + idee.id));
+      const li = el("li");
+      li.append(ligne);
+      liste.append(li);
+    }
+    bloc.append(liste);
+    apercu.append(bloc);
+  }
+
+  const sansDate = idees.filter((i) => !JOURS.includes(i.jour)).length;
+  if (sansDate && !filtreAReserver) {
+    const lien = el("button", "titre-apercu sans-date");
+    lien.type = "button";
+    lien.append(el("span", "", `💡 ${sansDate} ${sansDate > 1 ? "idées" : "idée"} sans date, à placer`), el("span", "fleche", "›"));
+    lien.addEventListener("click", () => allerAuDetail("jour-sans-date"));
+    apercu.append(lien);
   }
 }
 
@@ -390,6 +496,7 @@ function carteIdee(idee) {
   const carte = el("article", "carte"
     + (idee.statut === "fait" ? " faite" : "")
     + (JOURS.includes(idee.jour) ? "" : " non-affectee"));
+  carte.id = "idee-" + idee.id;
 
   const haut = el("div", "carte-haut");
   const ouvrir = el("button", "carte-titre");

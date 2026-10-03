@@ -397,6 +397,145 @@ main {
   .statut-fait { background: #1f3d25; color: #a4dcae; }
 }
 
+/* --- Programme : Aperçu / Détail --- */
+
+.vues {
+  display: flex;
+  margin: 12px 0 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--accent-doux);
+}
+
+.vues button {
+  flex: 1;
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--texte);
+  font-weight: 600;
+}
+
+.vues button[aria-pressed="true"] {
+  background: var(--carte);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+
+.compteur {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin: 12px 0 4px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: #fbe3cc;
+  color: #8a4b0f;
+  font-weight: 700;
+  text-align: left;
+}
+
+.compteur:disabled {
+  background: #d8efdc;
+  color: #23662f;
+}
+
+.compteur.actif {
+  background: var(--carte);
+  border: 1px solid var(--trait);
+  color: var(--texte);
+}
+
+@media (prefers-color-scheme: dark) {
+  .compteur { background: #4a3017; color: #f6c48f; }
+  .compteur:disabled { background: #1f3d25; color: #a4dcae; }
+}
+
+.jour-apercu {
+  margin-top: 18px;
+}
+
+.titre-apercu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 4px;
+  border: none;
+  border-bottom: 2px solid var(--accent-doux);
+  background: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+.titre-apercu .fleche {
+  color: var(--accent);
+  font-size: 1.4rem;
+}
+
+.titre-apercu.sans-date {
+  margin-top: 24px;
+  color: var(--discret);
+  border-bottom: 1px dashed var(--trait);
+}
+
+.liste-apercu {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.ligne-apercu {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.ligne-apercu.faite {
+  opacity: 0.5;
+}
+
+.heure-apercu {
+  flex: none;
+  width: 3.2em;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.nom-apercu {
+  flex: 1;
+}
+
+.reperes-apercu {
+  flex: none;
+}
+
+.titre-jour,
+.carte {
+  scroll-margin-top: 80px;
+}
+
+.carte.surlignee {
+  animation: surligner 2s ease-out;
+}
+
+@keyframes surligner {
+  0%, 40% { box-shadow: 0 0 0 3px var(--accent); }
+  100% { box-shadow: 0 0 0 3px transparent; }
+}
+
 /* --- Fiche (formulaire) --- */
 
 .fiche {
