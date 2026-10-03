@@ -39,3 +39,71 @@ h1 {
   color: var(--discret);
   font-size: 0.9rem;
 }
+
+.test {
+  margin-top: 40px;
+  text-align: left;
+}
+
+h2 {
+  font-size: 1.3rem;
+}
+
+.etat.ok {
+  color: #2f7a3d;
+}
+
+.etat.erreur {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+}
+
+input,
+button {
+  font: inherit;
+  min-height: 48px;
+  border-radius: 10px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px;
+  border: 1px solid var(--discret);
+  background: transparent;
+  color: var(--texte);
+}
+
+button {
+  padding: 0 18px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+#liste {
+  list-style: none;
+  padding: 0;
+}
+
+#liste li {
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--discret) 30%, transparent);
+}
+
+#liste .vide {
+  color: var(--discret);
+  font-style: italic;
+}
+
+.quand {
+  display: block;
+  color: var(--discret);
+  font-size: 0.8rem;
+}

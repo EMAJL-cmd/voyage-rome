@@ -5,12 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rome en famille</title>
   <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
 </head>
 <body>
   <main>
     <h1>Bonjour Rome ! 🏛️</h1>
     <p>Voyage en famille du 26 au 30 décembre.</p>
     <p class="petit">Solange · Emmanuelle · Jean-Laurent · Héloïse · Thomas</p>
+
+    <section class="test">
+      <h2>Test de partage</h2>
+      <p id="etat" class="etat">Connexion en cours…</p>
+      <form id="formulaire" hidden>
+        <input id="champ" type="text" maxlength="200" placeholder="Écrivez un petit mot…" autocomplete="off">
+        <button type="submit">Envoyer</button>
+      </form>
+      <ul id="liste"></ul>
+    </section>
   </main>
 </body>
 </html>

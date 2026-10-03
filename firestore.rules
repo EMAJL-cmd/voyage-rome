@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Chaque voyage est rangé sous un code secret d'au moins 16 caractères.
+    // Sans le code exact, impossible de lire ou d'écrire quoi que ce soit,
+    // et aucune règle ne permet de lister les voyages existants.
+    match /voyages/{code}/{rubrique}/{id} {
+      allow read, delete: if code.size() >= 16
+        && rubrique in ['test', 'programme', 'ressources', 'infos'];
+      allow create, update: if code.size() >= 16
+        && rubrique in ['test', 'programme', 'ressources', 'infos']
+        && request.resource.data.size() <= 20;
+    }
+  }
+}
