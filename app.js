@@ -3,7 +3,7 @@ import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
   arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=10";
+import { firebaseConfig } from "./firebase-config.js?v=11";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -78,6 +78,15 @@ function demarrer() {
   for (const bouton of document.querySelectorAll("[data-onglet]")) {
     bouton.addEventListener("click", () => ouvrirOnglet(bouton.dataset.onglet));
   }
+
+  // Mode d'emploi : chargé seulement à la première ouverture.
+  for (const bouton of document.querySelectorAll(".ouvrir-guide")) {
+    bouton.addEventListener("click", () => {
+      if (!$("cadre-guide").src) $("cadre-guide").src = "guide.html?v=11";
+      $("fiche-guide").showModal();
+    });
+  }
+  $("fermer-guide").addEventListener("click", () => $("fiche-guide").close());
 
   demarrerProgramme();
   demarrerRessources();

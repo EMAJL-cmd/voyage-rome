@@ -30,6 +30,9 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 ## Architecture (validée par Emmanuelle)
 - **La page** : HTML + CSS + JavaScript « pur », sans framework ni étape de compilation.
   Fichiers : `index.html`, `style.css`, `app.js`.
+  Mode d'emploi : `guide.html` (ouvert dans l'appli par « ❓ Mode d'emploi ») et sa version PDF
+  `Mode-d-emploi-Rome-en-famille.pdf` (à joindre aux messages). Les mettre à jour quand une fonction change.
+  Le PDF se refait avec Chrome : `--headless=new --print-to-pdf` sur `guide.html` servi en local.
 - **Le code** est versionné avec **Git** et stocké sur **GitHub**.
 - **L'hébergement** se fait sur **GitHub Pages** (gratuit) : chaque envoi sur GitHub met le site à jour.
   Dépôt : `EMAJL-cmd/voyage-rome`. Site : https://emajl-cmd.github.io/voyage-rome/

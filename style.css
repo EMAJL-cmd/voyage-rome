@@ -595,3 +595,37 @@ main {
     padding-bottom: 48px;
   }
 }
+
+/* --- Mode d'emploi dans l'application --- */
+
+.fiche-guide {
+  height: 90vh;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fiche-guide[open] {
+  display: flex;
+}
+
+.fiche-guide .fiche-entete {
+  margin: 0;
+}
+
+.fiche-guide .place-bouton {
+  width: 80px;
+}
+
+.fiche-guide iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: var(--fond);
+}
+
+@media (max-width: 767px) {
+  .fiche-guide {
+    height: 100%;
+  }
+}

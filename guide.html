@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rome en famille · Mode d'emploi</title>
+  <link rel="stylesheet" href="style.css?v=11">
+  <style>
+    /* Mise en page propre au mode d'emploi (les cartes et boutons reprennent le style de l'application) */
+    .guide {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .guide-titre {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .guide-titre h1 {
+      margin: 0;
+      font-size: 1.9rem;
+    }
+
+    .guide-titre p {
+      margin: 4px 0;
+      color: var(--discret);
+    }
+
+    .etape {
+      margin-top: 28px;
+      padding: 16px;
+      border-radius: 18px;
+      background: var(--carte);
+      border: 1px solid var(--trait);
+      break-inside: avoid;
+    }
+
+    .etape h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+    }
+
+    .numero {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.05rem;
+    }
+
+    .etape p,
+    .etape li {
+      margin: 6px 0;
+    }
+
+    .etape ul,
+    .etape ol {
+      padding-left: 22px;
+    }
+
+    /* Maquettes : de vrais éléments de l'application, figés */
+    .maquette {
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--fond);
+      border: 1px dashed var(--trait);
+      pointer-events: none;
+    }
+
+    .maquette .carte {
+      margin: 0;
+    }
+
+    .maquette .statut,
+    .maquette .bouton-modifier,
+    .maquette .bouton-principal,
+    .maquette .bouton-secondaire,
+    .maquette .bouton-danger {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .maquette .onglets {
+      position: static !important;
+      border: 1px solid var(--trait);
+      border-radius: 14px;
+      overflow: hidden;
+      padding-bottom: 0;
+    }
+
+    .maquette .onglets span[data-onglet] {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-height: 64px;
+      color: var(--discret);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .maquette .onglets span[data-onglet] b {
+      font-size: 1.4rem;
+      font-weight: normal;
+    }
+
+    .maquette .boutons-voyageurs {
+      margin-top: 0;
+    }
+
+    .maquette .boutons-voyageurs span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      border: 2px solid var(--accent);
+      border-radius: 14px;
+      background: var(--carte);
+      font-weight: 600;
+    }
+
+    .suite {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fleche {
+      color: var(--discret);
+    }
+
+    .legende {
+      list-style: none;
+      padding: 0 !important;
+    }
+
+    .legende li {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .repere {
+      flex: none;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .regles {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .regle {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--accent-doux);
+    }
+
+    .regle b:first-child {
+      font-size: 1.4rem;
+      line-height: 1.2;
+    }
+
+    .regle p {
+      margin: 0;
+    }
+
+    .fin {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--discret);
+    }
+
+    @media print {
+      body {
+        font-size: 13pt;
+      }
+
+      .guide {
+        padding-top: 0;
+      }
+
+      .etape {
+        margin-top: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="guide">
+
+    <div class="guide-titre">
+      <h1>Rome en famille 🏛️</h1>
+      <p><strong>Mode d'emploi</strong> · 2 minutes de lecture</p>
+      <p>Notre voyage du 26 au 30 décembre, organisé ensemble, chacun depuis son téléphone.</p>
+    </div>
+
+    <section class="etape">
+      <h2><span class="numero">1</span> Ouvrir et se présenter</h2>
+      <p>Touchez le <strong>lien</strong> envoyé par Emmanuelle, puis <strong>votre prénom</strong>. C'est tout : pas de compte, pas de mot de passe.</p>
+      <div class="maquette">
+        <div class="boutons-voyageurs">
+          <span>Solange</span>
+          <span>Emmanuelle</span>
+          <span>…</span>
+        </div>
+      </div>
+      <p>Le téléphone s'en souviendra. Vous prêtez votre téléphone ? En haut à droite, touchez <strong>« Ce n'est pas moi »</strong>.</p>
+    </section>
+
+    <section class="etape">
+      <h2><span class="numero">2</span> La garder sous la main</h2>
+      <p>Ajoutez-la à l'écran d'accueil : elle s'ouvrira comme une vraie application.</p>
+      <ul>
+        <li><strong>iPhone</strong> : bouton <strong>Partager</strong> (carré avec une flèche) → <strong>« Sur l'écran d'accueil »</strong></li>
+        <li><strong>Android</strong> : menu <strong>⋮</strong> → <strong>« Ajouter à l'écran d'accueil »</strong></li>
+      </ul>
+    </section>
+
+    <section class="etape">
+      <h2><span class="numero">3</span> Trois onglets, en bas de l'écran</h2>
+      <div class="maquette">
+        <nav class="onglets">
+          <span data-onglet><b>🏛️</b>Programme</span>
+          <span data-onglet><b>📚</b>À lire / à voir</span>
+          <span data-onglet><b>🧳</b>Infos pratiques</span>
+        </nav>
+      </div>
+      <ul class="legende">
+        <li><span class="repere">🏛️</span><span><strong>Programme</strong> : visites, restaurants et activités, jour par jour.</span></li>
+        <li><span class="repere">📚</span><span><strong>À lire / à voir</strong> : articles, vidéos et livres pour préparer les visites.</span></li>
+        <li><span class="repere">🧳</span><span><strong>Infos pratiques</strong> : vols, logement, adresses.</span></li>
+      </ul>
+    </section>
+
+    <section class="etape">
+      <h2><span class="numero">4</span> Le programme</h2>
+      <p>Chaque idée est une carte :</p>
+      <div class="maquette">
+        <article class="carte">
+          <div class="carte-haut">
+            <span class="carte-titre"><span class="heure">15h00</span><span class="icone">🏛️</span><span>Galleria Borghese</span></span>
+            <span class="etoile active">⭐</span>
+          </div>
+          <span class="lien-ressources">📚 2 choses à lire / à voir</span>
+          <div class="carte-bas">
+            <span class="statut statut-a_reserver">🟠 À réserver</span>
+            <span class="bouton-modifier">✏️ Modifier</span>
+          </div>
+          <p class="discret auteur">Proposé par Solange</p>
+        </article>
+      </div>
+      <ul class="legende">
+        <li><span class="repere">⭐</span><span>Un incontournable. Touchez l'étoile pour en mettre ou en enlever une.</span></li>
+        <li><span class="repere">🟠</span><span>Touchez le <strong>statut</strong> pour le faire avancer :</span></li>
+      </ul>
+      <div class="maquette suite">
+        <span class="statut statut-a_reserver">🟠 À réserver</span><span class="fleche">→</span>
+        <span class="statut statut-reserve">🔵 Réservé</span><span class="fleche">→</span>
+        <span class="statut statut-fait">🟢 Fait</span>
+      </div>
+      <ul class="legende">
+        <li><span class="repere">📚</span><span>Des lectures préparées pour cette visite : touchez pour les voir.</span></li>
+        <li><span class="repere">✏️</span><span><strong>Modifier</strong> : changer le jour, l'heure, ajouter un lien ou une note.</span></li>
+      </ul>
+
+      <p><strong>Proposer une idée</strong> :</p>
+      <div class="maquette suite">
+        <span class="bouton-principal">+ Ajouter</span><span class="fleche">→ remplir →</span>
+        <span class="bouton-principal">Enregistrer</span><span class="fleche">(en haut)</span>
+      </div>
+
+      <p><strong>Changer d'avis ?</strong> Rien ne se perd :</p>
+      <div class="maquette suite">
+        <span class="bouton-danger">Retirer du programme</span><span class="fleche">→ en bas, « Idées sans date, à placer » →</span>
+        <span class="bouton-modifier">↩️ Remettre au programme</span>
+      </div>
+    </section>
+
+    <section class="etape">
+      <h2><span class="numero">5</span> À lire / à voir</h2>
+      <p>Les trouvailles de Solange (et de tous) : un article, une vidéo, un livre, rangés par visite.</p>
+      <div class="maquette">
+        <article class="carte">
+          <div class="carte-haut">
+            <span class="carte-titre"><span class="icone">🎬</span><span>Apollon et Daphné, en 5 minutes</span></span>
+          </div>
+          <p class="note">À voir avant la Galleria Borghese !</p>
+          <span class="lien-externe">Ouvrir ↗</span>
+          <div class="carte-bas">
+            <span class="statut statut-libre">⬜ Vu</span>
+            <span class="bouton-modifier">✏️ Modifier</span>
+          </div>
+          <p class="discret auteur">Vu par Solange, Thomas · Proposé par Solange</p>
+        </article>
+      </div>
+      <p>Une fois lu ou vu, touchez <span class="maquette suite" style="display:inline-flex;margin:0;padding:2px 6px"><span class="statut statut-libre">⬜ Vu</span><span class="fleche">→</span><span class="statut statut-fait">✅ Vu</span></span> : chacun coche pour lui-même.</p>
+    </section>
+
+    <section class="etape">
+      <h2><span class="numero">6</span> Infos pratiques</h2>
+      <p>Les horaires des vols, l'adresse et les horaires du logement… Touchez une <strong>📍 adresse</strong> : elle s'ouvre dans Google Maps.</p>
+    </section>
+
+    <section class="etape">
+      <h2>💡 Bon à savoir</h2>
+      <div class="regles">
+        <div class="regle"><b>⚡</b><p><strong>Tout est en direct</strong> : ce que vous ajoutez apparaît aussitôt chez les autres.</p></div>
+        <div class="regle"><b>👀</b><p><strong>Tout le monde voit tout.</strong> Jamais de passeport, de carte bancaire ni de mot de passe.</p></div>
+        <div class="regle"><b>🔒</b><p><strong>Le lien est secret</strong> : ne le transférez pas en dehors de la famille.</p></div>
+      </div>
+    </section>
+
+    <p class="fin">Une question ? Demandez à Emmanuelle. 🙂<br>Buon viaggio !</p>
+  </main>
+</body>
+</html>

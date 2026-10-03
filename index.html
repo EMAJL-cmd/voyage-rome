@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=10">
-  <script type="module" src="app.js?v=10"></script>
+  <link rel="stylesheet" href="style.css?v=11">
+  <script type="module" src="app.js?v=11"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -27,6 +27,7 @@
     <h1>Rome en famille 🏛️</h1>
     <p>Qui êtes-vous ?</p>
     <div id="boutons-voyageurs" class="boutons-voyageurs"></div>
+    <p><button class="lien ouvrir-guide" type="button">❓ Première visite ? Lire le mode d'emploi</button></p>
   </section>
 
   <div id="application" hidden>
@@ -38,6 +39,7 @@
       <p class="moi">
         Bonjour <strong id="prenom"></strong><br>
         <button id="changer" class="lien" type="button">Ce n'est pas moi</button>
+        · <button class="lien ouvrir-guide" type="button">❓ Mode d'emploi</button>
       </p>
     </header>
 
@@ -74,6 +76,16 @@
       </section>
     </main>
   </div>
+
+  <!-- Mode d'emploi (le même que guide.html, affiché dans l'application) -->
+  <dialog id="fiche-guide" class="fiche fiche-guide">
+    <div class="fiche-entete">
+      <button id="fermer-guide" class="bouton-secondaire" type="button">Fermer</button>
+      <h2 tabindex="-1" autofocus>Mode d'emploi</h2>
+      <span class="place-bouton"></span>
+    </div>
+    <iframe id="cadre-guide" title="Mode d'emploi"></iframe>
+  </dialog>
 
   <!-- Formulaire d'ajout / de modification d'une idée du programme -->
   <dialog id="fiche-programme" class="fiche">
