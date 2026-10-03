@@ -1,8 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
-  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp,
+  arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=7";
+import { firebaseConfig } from "./firebase-config.js?v=8";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -79,6 +80,7 @@ function demarrer() {
   }
 
   demarrerProgramme();
+  demarrerRessources();
   demarrerInfos();
   afficher();
 }
@@ -155,6 +157,7 @@ function demarrerProgramme() {
       $("etat-programme").hidden = true;
       idees = resultat.docs.map((d) => ({ id: d.id, ...d.data() }));
       afficherProgramme();
+      afficherRessources();
     },
     (erreur) => signalerErreur($("etat-programme"), erreur)
   );
@@ -316,6 +319,16 @@ function carteIdee(idee) {
   if (idee.prix) carte.append(el("p", "details", idee.prix));
   if (idee.note) carte.append(el("p", "note", idee.note));
 
+  // Raccourci vers les articles et vidéos liés à cette visite.
+  const nbRessources = ressources.filter((r) => r.visite === idee.id).length;
+  if (nbRessources) {
+    const voir = el("button", "lien-ressources",
+      `📚 ${nbRessources} ${nbRessources > 1 ? "choses" : "chose"} à lire / à voir`);
+    voir.type = "button";
+    voir.addEventListener("click", () => ouvrirOnglet("ressources"));
+    carte.append(voir);
+  }
+
   const lien = lienSur(idee.lien);
   if (lien) {
     const a = el("a", "lien-externe", "Ouvrir le lien ↗");
@@ -338,6 +351,185 @@ function carteIdee(idee) {
   bas.append(statut, modifier);
   carte.append(bas);
   if (idee.auteur) carte.append(el("p", "discret auteur", "Proposé par " + idee.auteur));
+
+  return carte;
+}
+
+/* ---------- À lire / à voir ---------- */
+
+const TYPES_RESSOURCE = {
+  article: { icone: "📰", fait: "Lu" },
+  video: { icone: "🎬", fait: "Vu" },
+  livre: { icone: "📖", fait: "Lu" },
+  podcast: { icone: "🎧", fait: "Écouté" },
+};
+
+let ressources = [];
+let ressourceOuverte = null; // null = nouvelle ressource
+
+function demarrerRessources() {
+  const collectionRessources = collection(db, "voyages", code, "ressources");
+
+  onSnapshot(
+    collectionRessources,
+    (resultat) => {
+      $("etat-ressources").hidden = true;
+      ressources = resultat.docs.map((d) => ({ id: d.id, ...d.data() }));
+      afficherRessources();
+      afficherProgramme();
+    },
+    (erreur) => signalerErreur($("etat-ressources"), erreur)
+  );
+
+  const fiche = $("fiche-ressources");
+  const formulaire = $("formulaire-ressources");
+
+  $("ajouter-ressources").addEventListener("click", () => ouvrirFicheRessource(null));
+  $("annuler-ressources").addEventListener("click", () => fiche.close());
+
+  $("supprimer-ressources").addEventListener("click", async () => {
+    if (!ressourceOuverte) return;
+    if (!confirm(`Supprimer « ${ressourceOuverte.titre} » pour toute la famille ?`)) return;
+    fiche.close();
+    try {
+      await deleteDoc(doc(collectionRessources, ressourceOuverte.id));
+    } catch (erreur) {
+      signalerErreur($("etat-ressources"), erreur);
+    }
+  });
+
+  formulaire.addEventListener("submit", async (evenement) => {
+    evenement.preventDefault();
+    const f = formulaire.elements;
+    const donnees = {
+      type: f.type.value,
+      titre: f.titre.value.trim(),
+      lien: f.lien.value.trim(),
+      note: f.note.value.trim(),
+      visite: f.visite.value,
+      modifiePar: moi(),
+      modifieLe: serverTimestamp(),
+    };
+    if (!donnees.titre) return;
+    fiche.close();
+    try {
+      if (ressourceOuverte) {
+        await updateDoc(doc(collectionRessources, ressourceOuverte.id), donnees);
+      } else {
+        await addDoc(collectionRessources, { ...donnees, luPar: [], auteur: moi(), creeLe: serverTimestamp() });
+      }
+    } catch (erreur) {
+      signalerErreur($("etat-ressources"), erreur);
+    }
+  });
+}
+
+// Les idées du programme dans l'ordre du voyage (les « Non affecté » à la fin).
+function ideesDansLOrdre() {
+  return [...idees].sort((a, b) =>
+    (JOURS.includes(a.jour) ? a.jour : "9").localeCompare(JOURS.includes(b.jour) ? b.jour : "9") ||
+    (a.heure || "99").localeCompare(b.heure || "99") ||
+    (a.nom || "").localeCompare(b.nom || "", "fr"));
+}
+
+function ouvrirFicheRessource(ressource) {
+  ressourceOuverte = ressource;
+  const f = $("formulaire-ressources").elements;
+  const r = ressource || {};
+  $("titre-fiche-ressources").textContent = ressource ? "Modifier" : "Nouvelle ressource";
+  f.type.value = TYPES_RESSOURCE[r.type] ? r.type : "article";
+  f.titre.value = r.titre || "";
+  f.lien.value = r.lien || "";
+  f.note.value = r.note || "";
+
+  const choix = [new Option("Aucune (pour tout le voyage)", "")];
+  for (const idee of ideesDansLOrdre()) {
+    const jour = JOURS.includes(idee.jour) ? jourLisible(idee.jour).split(" ").slice(0, 2).join(" ") + " · " : "";
+    choix.push(new Option(jour + (idee.nom || "(sans nom)"), idee.id));
+  }
+  f.visite.replaceChildren(...choix);
+  f.visite.value = idees.some((i) => i.id === r.visite) ? r.visite : "";
+
+  $("auteur-fiche-ressources").textContent = ressource?.auteur ? `Proposé par ${ressource.auteur}` : "";
+  $("supprimer-ressources").hidden = !ressource;
+  $("fiche-ressources").showModal();
+}
+
+async function basculerLu(ressource) {
+  const dejaLu = (ressource.luPar || []).includes(moi());
+  try {
+    await updateDoc(doc(db, "voyages", code, "ressources", ressource.id), {
+      luPar: dejaLu ? arrayRemove(moi()) : arrayUnion(moi()),
+    });
+  } catch (erreur) {
+    signalerErreur($("etat-ressources"), erreur);
+  }
+}
+
+function afficherRessources() {
+  const liste = $("liste-ressources");
+  if (!liste) return;
+  liste.replaceChildren();
+
+  if (ressources.length === 0) {
+    liste.append(el("p", "vide", "Rien pour l'instant. Touchez « + Ajouter » pour partager un article, une vidéo ou un livre."));
+    return;
+  }
+
+  // D'abord ce qui concerne tout le voyage, puis visite par visite dans l'ordre du programme.
+  const parTitre = (a, b) => (a.titre || "").localeCompare(b.titre || "", "fr");
+  const generales = ressources.filter((r) => !idees.some((i) => i.id === r.visite));
+  if (generales.length) {
+    liste.append(el("h3", "titre-jour", "Pour tout le voyage"));
+    for (const r of generales.sort(parTitre)) liste.append(carteRessource(r));
+  }
+  for (const idee of ideesDansLOrdre()) {
+    const liees = ressources.filter((r) => r.visite === idee.id);
+    if (liees.length === 0) continue;
+    liste.append(el("h3", "titre-jour", (TYPES[idee.type] || "📍") + " " + (idee.nom || "(sans nom)")));
+    for (const r of liees.sort(parTitre)) liste.append(carteRessource(r));
+  }
+}
+
+function carteRessource(ressource) {
+  const type = TYPES_RESSOURCE[ressource.type] || TYPES_RESSOURCE.article;
+  const luPar = (ressource.luPar || []).filter((p) => VOYAGEURS.includes(p));
+  const jAiLu = luPar.includes(moi());
+  const carte = el("article", "carte");
+
+  const haut = el("div", "carte-haut");
+  const ouvrir = el("button", "carte-titre");
+  ouvrir.type = "button";
+  ouvrir.append(el("span", "icone", type.icone), el("span", "", ressource.titre || "(sans titre)"));
+  ouvrir.addEventListener("click", () => ouvrirFicheRessource(ressource));
+  haut.append(ouvrir);
+  carte.append(haut);
+
+  if (ressource.note) carte.append(el("p", "note", ressource.note));
+
+  const lien = lienSur(ressource.lien);
+  if (lien) {
+    const a = el("a", "lien-externe", "Ouvrir ↗");
+    a.href = lien;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    carte.append(a);
+  }
+
+  const bas = el("div", "carte-bas");
+  const lu = el("button", "statut " + (jAiLu ? "statut-fait" : "statut-libre"), (jAiLu ? "✅ " : "⬜ ") + type.fait);
+  lu.type = "button";
+  lu.setAttribute("aria-pressed", String(jAiLu));
+  lu.addEventListener("click", () => basculerLu(ressource));
+  const modifier = el("button", "bouton-modifier", "✏️ Modifier");
+  modifier.type = "button";
+  modifier.addEventListener("click", () => ouvrirFicheRessource(ressource));
+  bas.append(lu, modifier);
+  carte.append(bas);
+
+  carte.append(el("p", "discret auteur",
+    (luPar.length ? `${type.fait} par ${luPar.join(", ")}` : `Personne n'a encore ${type.fait === "Vu" ? "vu" : type.fait === "Écouté" ? "écouté" : "lu"}`)
+    + (ressource.auteur ? ` · Proposé par ${ressource.auteur}` : "")));
 
   return carte;
 }

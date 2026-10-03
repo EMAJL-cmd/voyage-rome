@@ -322,6 +322,18 @@ main {
   white-space: pre-line;
 }
 
+.lien-ressources {
+  display: block;
+  margin-top: 6px;
+  min-height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+}
+
 .lien-externe {
   display: block;
   width: fit-content;

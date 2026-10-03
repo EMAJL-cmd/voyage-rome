@@ -22,6 +22,7 @@ son ordinateur, **sans avoir à créer de compte**.
      n'est proposée que pour une idée déjà « Non affecté ».
 2. **À lire / à voir** : articles, vidéos et livres partagés, qu'on peut rattacher à une visite
    du Programme. Chaque personne coche « lu / vu ».
+   Sur la carte d'une visite du Programme, un raccourci « 📚 N choses à lire / à voir » ouvre l'onglet.
 3. **Infos pratiques** : trains et vols, hôtels (adresses, horaires, numéros de réservation).
 
 Les valises et les dépenses ont été écartées volontairement. Ne pas les ajouter sans demande.
@@ -73,7 +74,7 @@ Les valises et les dépenses ont été écartées volontairement. Ne pas les ajo
 - [x] Étape 1 — Page « Bonjour Rome » publiée sur GitHub Pages et ouverte sur téléphone
 - [x] Étape 2 — Branchement de Firebase et test de partage avec un membre de la famille
 - [x] Étape 3 — Squelette : 3 onglets, choix « Qui êtes-vous ? »
-- [ ] Étape 4 — Programme
-- [ ] Étape 5 — À lire / à voir
-- [ ] Étape 6 — Infos pratiques
+- [x] Étape 4 — Programme
+- [ ] Étape 5 — À lire / à voir (en ligne, à tester)
+- [ ] Étape 6 — Infos pratiques (en ligne, vols et logement saisis, à tester)
 - [ ] Étape 7 — Finitions et test sur les téléphones de la famille

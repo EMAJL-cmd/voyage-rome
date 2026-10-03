@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#b5462b">
   <title>Rome en famille</title>
-  <link rel="stylesheet" href="style.css?v=7">
-  <script type="module" src="app.js?v=7"></script>
+  <link rel="stylesheet" href="style.css?v=8">
+  <script type="module" src="app.js?v=8"></script>
 </head>
 <body>
   <!-- Visible tant que le script n'a pas démarré -->
@@ -57,8 +57,12 @@
         <div id="liste-programme"><p class="vide">Chargement du programme…</p></div>
       </section>
       <section id="ressources" class="rubrique">
-        <h2>À lire / à voir</h2>
-        <p class="vide">Bientôt ici : les articles, vidéos et livres à découvrir avant de partir.</p>
+        <div class="titre-rubrique">
+          <h2>À lire / à voir</h2>
+          <button id="ajouter-ressources" class="bouton-principal" type="button">+ Ajouter</button>
+        </div>
+        <p id="etat-ressources" class="etat" hidden></p>
+        <div id="liste-ressources"><p class="vide">Chargement…</p></div>
       </section>
       <section id="infos" class="rubrique">
         <div class="titre-rubrique">
@@ -136,6 +140,46 @@
         <button id="supprimer-programme" class="bouton-danger" type="button">Supprimer définitivement</button>
         <span class="espace"></span>
         <button id="annuler-programme" class="bouton-secondaire" type="button">Annuler</button>
+        <button class="bouton-principal" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Formulaire d'ajout / de modification d'une ressource (article, vidéo…) -->
+  <dialog id="fiche-ressources" class="fiche">
+    <form id="formulaire-ressources" method="dialog">
+      <h2 id="titre-fiche-ressources">Nouvelle ressource</h2>
+
+      <fieldset class="choix-type">
+        <legend>Type</legend>
+        <label><input type="radio" name="type" value="article" checked><span>📰 Article</span></label>
+        <label><input type="radio" name="type" value="video"><span>🎬 Vidéo</span></label>
+        <label><input type="radio" name="type" value="livre"><span>📖 Livre</span></label>
+        <label><input type="radio" name="type" value="podcast"><span>🎧 Podcast</span></label>
+      </fieldset>
+
+      <label>Titre
+        <input name="titre" type="text" maxlength="160" required placeholder="Ex. : Le Bernin, sculpteur du mouvement">
+      </label>
+
+      <label>Lien (facultatif)
+        <input name="lien" type="url" maxlength="500" placeholder="https://…">
+      </label>
+
+      <label>Pourquoi c'est intéressant (facultatif)
+        <textarea name="note" rows="4" maxlength="2000" placeholder="Ex. : À lire avant la Galleria Borghese, pour comprendre Apollon et Daphné."></textarea>
+      </label>
+
+      <label>En lien avec une visite (facultatif)
+        <select name="visite"></select>
+      </label>
+
+      <p id="auteur-fiche-ressources" class="discret"></p>
+
+      <div class="actions">
+        <button id="supprimer-ressources" class="bouton-danger" type="button">Supprimer</button>
+        <span class="espace"></span>
+        <button id="annuler-ressources" class="bouton-secondaire" type="button">Annuler</button>
         <button class="bouton-principal" type="submit">Enregistrer</button>
       </div>
     </form>
