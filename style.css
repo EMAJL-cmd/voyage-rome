@@ -255,6 +255,23 @@ main {
   background: var(--carte);
 }
 
+.carte.non-affectee {
+  border-style: dashed;
+  background: transparent;
+}
+
+.aide-fiche:empty {
+  display: none;
+}
+
+.aide-fiche {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-doux);
+  font-size: 0.95rem;
+}
+
 .carte.faite {
   opacity: 0.65;
 }

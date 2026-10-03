@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/fireba
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js?v=5";
+import { firebaseConfig } from "./firebase-config.js?v=6";
 
 const VOYAGEURS = ["Solange", "Emmanuelle", "Jean-Laurent", "Héloïse", "Thomas"];
 const ONGLETS = ["programme", "ressources", "infos"];
@@ -164,9 +164,24 @@ function demarrerProgramme() {
   $("ajouter-programme").addEventListener("click", () => ouvrirFiche(null));
   $("annuler-programme").addEventListener("click", () => fiche.close());
 
+  // « Retirer » ne supprime rien : l'idée va dans « Non affecté », en bas du programme,
+  // avec toutes ses informations. On la remet au programme en lui redonnant un jour.
+  $("retirer-programme").addEventListener("click", async () => {
+    if (!ideeOuverte) return;
+    fiche.close();
+    try {
+      await updateDoc(doc(programme, ideeOuverte.id), {
+        jour: "", modifiePar: moi(), modifieLe: serverTimestamp(),
+      });
+    } catch (erreur) {
+      signalerErreur($("etat-programme"), erreur);
+    }
+  });
+
+  // Suppression définitive : seulement pour une idée déjà « Non affecté ».
   $("supprimer-programme").addEventListener("click", async () => {
     if (!ideeOuverte) return;
-    if (!confirm(`Supprimer « ${ideeOuverte.nom} » du programme ?`)) return;
+    if (!confirm(`Supprimer définitivement « ${ideeOuverte.nom} » pour toute la famille ?`)) return;
     fiche.close();
     try {
       await deleteDoc(doc(programme, ideeOuverte.id));
@@ -209,7 +224,11 @@ function ouvrirFiche(idee) {
   ideeOuverte = idee;
   const f = $("formulaire-programme").elements;
   const i = idee || {};
-  $("titre-fiche-programme").textContent = idee ? "Modifier" : "Nouvelle idée";
+  const affectee = JOURS.includes(i.jour);
+  $("titre-fiche-programme").textContent = !idee ? "Nouvelle idée" : affectee ? "Modifier" : "Remettre au programme";
+  $("aide-fiche-programme").textContent = idee && !affectee
+    ? "Choisissez un jour (et une heure), puis « Enregistrer » : l'idée reprendra sa place dans le programme."
+    : "";
   f.nom.value = i.nom || "";
   f.type.value = TYPES[i.type] ? i.type : "visite";
   f.jour.value = JOURS.includes(i.jour) ? i.jour : "";
@@ -220,7 +239,8 @@ function ouvrirFiche(idee) {
   f.lien.value = i.lien || "";
   f.note.value = i.note || "";
   $("auteur-fiche-programme").textContent = idee?.auteur ? `Proposé par ${idee.auteur}` : "";
-  $("supprimer-programme").hidden = !idee;
+  $("retirer-programme").hidden = !idee || !affectee;
+  $("supprimer-programme").hidden = !idee || affectee;
   $("fiche-programme").showModal();
 }
 
@@ -263,7 +283,7 @@ function afficherProgramme() {
 
   const groupes = [
     ...JOURS.map((jour) => [jourLisible(jour), idees.filter((i) => i.jour === jour)]),
-    ["Idées sans date", idees.filter((i) => !JOURS.includes(i.jour))],
+    ["Non affecté", idees.filter((i) => !JOURS.includes(i.jour))],
   ];
 
   for (const [titre, elements] of groupes) {
@@ -274,12 +294,14 @@ function afficherProgramme() {
 }
 
 function carteIdee(idee) {
-  const carte = el("article", "carte" + (idee.statut === "fait" ? " faite" : ""));
+  const carte = el("article", "carte"
+    + (idee.statut === "fait" ? " faite" : "")
+    + (JOURS.includes(idee.jour) ? "" : " non-affectee"));
 
   const haut = el("div", "carte-haut");
   const ouvrir = el("button", "carte-titre");
   ouvrir.type = "button";
-  if (idee.heure) ouvrir.append(el("span", "heure", idee.heure.replace(":", "h")));
+  if (idee.heure && JOURS.includes(idee.jour)) ouvrir.append(el("span", "heure", idee.heure.replace(":", "h")));
   ouvrir.append(el("span", "icone", TYPES[idee.type] || "📍"), el("span", "", idee.nom || "(sans nom)"));
   ouvrir.addEventListener("click", () => ouvrirFiche(idee));
 
@@ -308,7 +330,8 @@ function carteIdee(idee) {
   statut.type = "button";
   statut.setAttribute("aria-label", "Statut : " + statut.textContent + ". Toucher pour passer au suivant.");
   statut.addEventListener("click", () => changerStatut(idee));
-  const modifier = el("button", "bouton-modifier", "✏️ Modifier");
+  const modifier = el("button", "bouton-modifier",
+    JOURS.includes(idee.jour) ? "✏️ Modifier" : "↩️ Remettre au programme");
   modifier.type = "button";
   modifier.addEventListener("click", () => ouvrirFiche(idee));
   bas.append(statut, modifier);

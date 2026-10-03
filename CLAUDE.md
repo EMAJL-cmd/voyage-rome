@@ -17,6 +17,9 @@ son ordinateur, **sans avoir à créer de compte**.
    - Statut : `à réserver` → `réservé` → `fait`
    - Une étoile « prioritaire » (pour les incontournables de Solange)
    - Date, heure, prix, lien et note facultatifs, et le nom de la personne qui a fait la proposition
+   - « Retirer du programme » ne supprime pas : l'idée passe dans « Non affecté » (en bas), avec toutes
+     ses informations. On la remet au programme en lui redonnant un jour. La suppression définitive
+     n'est proposée que pour une idée déjà « Non affecté ».
 2. **À lire / à voir** : articles, vidéos et livres partagés, qu'on peut rattacher à une visite
    du Programme. Chaque personne coche « lu / vu ».
 3. **Infos pratiques** : trains et vols, hôtels (adresses, horaires, numéros de réservation).
